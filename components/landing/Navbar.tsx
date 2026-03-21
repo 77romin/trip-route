@@ -1,0 +1,157 @@
+"use client";
+
+import { cn } from "@/lib/utils";
+import { Map, LogOut } from "lucide-react";
+import Link from "next/link";
+import Image from "next/image";
+import { useEffect, useState } from "react";
+import type { User } from "@supabase/supabase-js";
+import { createClient } from "@/lib/supabase/client";
+import { signOut } from "@/app/(auth)/actions";
+import Button from "@/components/ui/Button";
+
+function getInitials(user: User): string {
+  const fullName = user.user_metadata?.full_name as string | undefined;
+  if (fullName) {
+    return fullName
+      .split(" ")
+      .map((w) => w[0])
+      .join("")
+      .slice(0, 2)
+      .toUpperCase();
+  }
+  return (user.email?.[0] ?? "?").toUpperCase();
+}
+
+function Avatar({ user }: { user: User }) {
+  const avatarUrl = user.user_metadata?.avatar_url as string | undefined;
+  const initials = getInitials(user);
+
+  if (avatarUrl) {
+    return (
+      <Image
+        src={avatarUrl}
+        alt="프로필"
+        width={32}
+        height={32}
+        className="w-8 h-8 rounded-full object-cover border border-gray-200"
+      />
+    );
+  }
+
+  return (
+    <div className="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center text-xs font-semibold flex-shrink-0">
+      {initials}
+    </div>
+  );
+}
+
+export default function Navbar() {
+  const [scrolled, setScrolled] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+  const [authReady, setAuthReady] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  useEffect(() => {
+    const supabase = createClient();
+
+    // 초기 세션 확인
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setUser(user);
+      setAuthReady(true);
+    });
+
+    // 로그인/로그아웃 상태 변경 감지
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+      setAuthReady(true);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  return (
+    <nav
+      className={cn(
+        "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
+        scrolled
+          ? "bg-white/90 backdrop-blur-xl border-b border-black/5 py-3"
+          : "bg-transparent py-5"
+      )}
+    >
+      <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
+        {/* 로고 */}
+        <Link href="/" className="flex items-center gap-2.5 group">
+          <div className="w-8 h-8 rounded-lg bg-black flex items-center justify-center group-hover:bg-gray-800 transition-colors">
+            <Map className="w-4 h-4 text-white" />
+          </div>
+          <span className="text-black font-semibold text-lg tracking-tight">
+            TripRoute
+          </span>
+        </Link>
+
+        {/* 네비 링크 */}
+        <div className="hidden md:flex items-center gap-8">
+          {[
+            { label: "나의 지도", href: "/trips" },
+            { label: "최고의 지도", href: "/best-maps" },
+            { label: "사용법", href: "/how-to-use" },
+          ].map(({ label, href }) => (
+            <Link
+              key={label}
+              href={href}
+              className="text-gray-400 hover:text-black text-sm transition-colors"
+            >
+              {label}
+            </Link>
+          ))}
+        </div>
+
+        {/* 우측 버튼 영역 */}
+        <div className="flex items-center gap-3 min-w-[160px] justify-end">
+          {/* 인증 상태 확인 전: 레이아웃 시프트 방지용 빈 공간 */}
+          {!authReady ? null : user ? (
+            /* 로그인 후: 아바타 + 로그아웃 */
+            <>
+              <Link href="/trips">
+                <Avatar user={user} />
+              </Link>
+              <form action={signOut}>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  type="submit"
+                  className="flex items-center gap-1.5"
+                >
+                  <LogOut className="w-3.5 h-3.5" />
+                  로그아웃
+                </Button>
+              </form>
+            </>
+          ) : (
+            /* 로그인 전: 로그인 + 시작하기 */
+            <>
+              <Link href="/login">
+                <Button variant="ghost" size="sm">
+                  로그인
+                </Button>
+              </Link>
+              <Link href="/trips">
+                <Button variant="primary" size="sm">
+                  로그인 없이 시작하기
+                </Button>
+              </Link>
+            </>
+          )}
+        </div>
+      </div>
+    </nav>
+  );
+}
