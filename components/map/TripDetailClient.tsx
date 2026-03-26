@@ -24,11 +24,13 @@ import type { Trip, Place } from "@/types";
 import TripMap, { type TravelMode, type MapLayerType, type DblClickPlaceInfo, getDayColor } from "./TripMap";
 import PlaceSearch from "./PlaceSearch";
 import PlaceCard from "./PlaceCard";
+import PlaceDetailPanel from "./PlaceDetailPanel";
 import MapClickConfirm from "./MapClickConfirm";
 import {
   addPlace,
   removePlace,
   reorderPlaces,
+  updatePlace,
 } from "@/app/(dashboard)/trips/[id]/actions";
 
 interface Props {
@@ -63,10 +65,12 @@ function DraggablePlaceCard({
   place,
   index,
   onRemove,
+  onClick,
 }: {
   place: Place;
   index: number;
   onRemove: () => void;
+  onClick: () => void;
 }) {
   const controls = useDragControls();
   return (
@@ -80,6 +84,7 @@ function DraggablePlaceCard({
         place={place}
         index={index}
         onRemove={onRemove}
+        onClick={onClick}
         dragControls={controls}
       />
     </Reorder.Item>
@@ -92,6 +97,7 @@ export default function TripDetailClient({ trip, initialPlaces }: Props) {
   const [selectedDay, setSelectedDay] = useState(1);
   const [isAddingPlace, setIsAddingPlace] = useState(false);
   const [dblClickPlace, setDblClickPlace] = useState<DblClickPlaceInfo | null>(null);
+  const [selectedPlace, setSelectedPlace] = useState<Place | null>(null);
   const [travelMode, setTravelMode] = useState<TravelMode>("DRIVING");
   const [mapLayer, setMapLayer] = useState<MapLayerType>("roadmap");
   const [, startTransition] = useTransition();
@@ -178,6 +184,27 @@ export default function TripDetailClient({ trip, initialPlaces }: Props) {
     startTransition(async () => {
       try {
         await removePlace(placeId, trip.id);
+      } catch {
+        setPlaces(initialPlaces);
+      }
+    });
+  }
+
+  function handleUpdatePlace(
+    placeId: string,
+    data: { notes?: string; duration_minutes?: number | null; category?: import("@/types").PlaceCategory }
+  ) {
+    setPlaces((prev) =>
+      prev.map((p) =>
+        p.id === placeId ? { ...p, ...data } as Place : p
+      )
+    );
+    setSelectedPlace((prev) =>
+      prev && prev.id === placeId ? { ...prev, ...data } as Place : prev
+    );
+    startTransition(async () => {
+      try {
+        await updatePlace(placeId, trip.id, data);
       } catch {
         setPlaces(initialPlaces);
       }
@@ -305,6 +332,7 @@ export default function TripDetailClient({ trip, initialPlaces }: Props) {
                             place={place}
                             index={i + 1}
                             onRemove={() => handleRemovePlace(place.id)}
+                            onClick={() => setSelectedPlace(place)}
                           />
                         ))}
                       </div>
@@ -337,6 +365,7 @@ export default function TripDetailClient({ trip, initialPlaces }: Props) {
                   place={place}
                   index={index + 1}
                   onRemove={() => handleRemovePlace(place.id)}
+                  onClick={() => setSelectedPlace(place)}
                 />
               ))}
             </Reorder.Group>
@@ -433,6 +462,18 @@ export default function TripDetailClient({ trip, initialPlaces }: Props) {
           )}
         </AnimatePresence>
       </div>
+
+      {/* 장소 상세 패널 */}
+      <AnimatePresence>
+        {selectedPlace && (
+          <PlaceDetailPanel
+            key={selectedPlace.id}
+            place={selectedPlace}
+            onClose={() => setSelectedPlace(null)}
+            onUpdate={handleUpdatePlace}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }

@@ -46,3 +46,17 @@ export async function reorderPlaces(
   );
   revalidatePath(`/trips/${tripId}`);
 }
+
+export async function updatePlace(
+  placeId: string,
+  tripId: string,
+  data: { notes?: string; duration_minutes?: number | null; category?: PlaceCategory }
+) {
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("places")
+    .update(data)
+    .eq("id", placeId);
+  if (error) throw new Error(error.message);
+  revalidatePath(`/trips/${tripId}`);
+}

@@ -14,6 +14,7 @@ export default async function SettingsPage() {
 
   const email = user?.email ?? "";
   const fullName = (user?.user_metadata?.full_name as string | undefined) ?? "";
+  const avatarUrl = (user?.user_metadata?.avatar_url as string | undefined) ?? "";
 
   return (
     <div className="p-8 max-w-xl">
@@ -22,7 +23,7 @@ export default async function SettingsPage() {
         <p className="text-gray-400 text-sm">계정 정보와 보안을 관리하세요.</p>
       </div>
 
-      <SettingsForm email={email} fullName={fullName} />
+      <SettingsForm email={email} fullName={fullName} avatarUrl={avatarUrl} />
     </div>
   );
 }

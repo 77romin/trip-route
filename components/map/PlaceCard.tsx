@@ -33,6 +33,7 @@ interface PlaceCardProps {
   place: Place;
   index: number;
   onRemove: () => void;
+  onClick?: () => void;
   dragControls?: DragControls;
   readOnly?: boolean;
 }
@@ -41,6 +42,7 @@ export default function PlaceCard({
   place,
   index,
   onRemove,
+  onClick,
   dragControls,
   readOnly = false,
 }: PlaceCardProps) {
@@ -48,7 +50,13 @@ export default function PlaceCard({
   const Icon = config.icon;
 
   return (
-    <div className="group bg-white rounded-xl border border-gray-100 p-3.5 flex items-start gap-2 hover:border-gray-200 transition-all">
+    <div
+      onClick={onClick}
+      className={cn(
+        "group bg-white rounded-xl border border-gray-100 p-3.5 flex items-start gap-2 hover:border-gray-200 transition-all",
+        onClick && "cursor-pointer"
+      )}
+    >
       {/* 드래그 핸들 */}
       {dragControls && (
         <div

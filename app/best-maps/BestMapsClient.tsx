@@ -85,13 +85,14 @@ function TripCard({
             {trip.region}
           </span>
         )}
-        {rank <= 3 && (
+        {rank <= 10 && (
           <span
             className={cn(
               "absolute top-3 right-3 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shadow-sm",
               rank === 1 && "bg-yellow-400 text-yellow-900",
               rank === 2 && "bg-gray-300 text-gray-600",
-              rank === 3 && "bg-orange-300 text-orange-800"
+              rank === 3 && "bg-orange-300 text-orange-800",
+              rank >= 4 && rank <= 10 && "bg-white/90 text-gray-700 border border-gray-200"
             )}
           >
             {rank}

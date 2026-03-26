@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, Fragment } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { GoogleMap, Marker, Polyline, DirectionsRenderer } from "@react-google-maps/api";
 import {
@@ -98,6 +98,9 @@ export default function TripMap({
     (google.maps.DirectionsResult | null)[]
   >([]);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [multiDayDirections, setMultiDayDirections] = useState<
+    Record<number, (google.maps.DirectionsResult | null)[]>
+  >({});
 
   const mapOptions = useMemo<google.maps.MapOptions>(
     () => ({
@@ -154,11 +157,15 @@ export default function TripMap({
     [places]
   );
 
-  // 경로 계산 (활성 일자 places 기준)
+  const backgroundPlacesRouteKey = useMemo(
+    () => (backgroundPlaces ?? []).map((p) => `${p.id}:${p.day}:${p.order}`).join(","),
+    [backgroundPlaces]
+  );
+
+  // 경로 계산 (활성 일자 places 기준 — 모든 수단 구간별 분할)
   useEffect(() => {
     let cancelled = false;
 
-    // 이전 경로를 즉시 제거 — 재계산 전까지 직선 fallback이 표시됨
     setDirections(null);
     setSegmentDirections([]);
 
@@ -167,79 +174,104 @@ export default function TripMap({
     }
 
     const service = new google.maps.DirectionsService();
+    const gMode = travelMode === "TRANSIT"
+      ? google.maps.TravelMode.TRANSIT
+      : google.maps.TravelMode[travelMode];
 
-    // TRANSIT: 경유지 미지원 → 구간별 분할
-    if (travelMode === "TRANSIT" && places.length > 2) {
-      const fetchAll = async () => {
-        const results = await Promise.all(
-          places.slice(0, -1).map((from, i) =>
+    const fetchAll = async () => {
+      const results = await Promise.all(
+        places.slice(0, -1).map((from, i) =>
+          fetchRoute(service, {
+            origin: { lat: from.lat, lng: from.lng },
+            destination: { lat: places[i + 1].lat, lng: places[i + 1].lng },
+            travelMode: gMode,
+          })
+        )
+      );
+
+      if (cancelled) return;
+
+      const dirResults = results.map((r) => r.result);
+      const failedCount = dirResults.filter((r) => r === null).length;
+
+      if (failedCount === dirResults.length) {
+        setToastMessage("경로를 찾지 못했어요. 직선으로 표시해요.");
+      } else if (failedCount > 0) {
+        setToastMessage(
+          `${failedCount}개 구간은 경로가 없어 직선으로 표시했어요.`
+        );
+      }
+
+      setSegmentDirections(dirResults);
+    };
+
+    fetchAll();
+    return () => {
+      cancelled = true;
+    };
+  }, [isLoaded, travelMode, placesRouteKey]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // 전체 보기(selectedDay=0) 시 일자별 경로 계산
+  useEffect(() => {
+    let cancelled = false;
+    setMultiDayDirections({});
+
+    if (selectedDay !== 0 || !isLoaded || travelMode === "STRAIGHT") {
+      return;
+    }
+
+    const service = new google.maps.DirectionsService();
+    const gMode = travelMode === "TRANSIT"
+      ? google.maps.TravelMode.TRANSIT
+      : google.maps.TravelMode[travelMode];
+    const days = Object.keys(placesByDay).map(Number);
+
+    const calculateAllDays = async () => {
+      const results: Record<number, (google.maps.DirectionsResult | null)[]> = {};
+
+      for (const day of days) {
+        const dp = placesByDay[day];
+        if (dp.length < 2) continue;
+
+        const segResults = await Promise.all(
+          dp.slice(0, -1).map((from, i) =>
             fetchRoute(service, {
               origin: { lat: from.lat, lng: from.lng },
-              destination: { lat: places[i + 1].lat, lng: places[i + 1].lng },
-              travelMode: google.maps.TravelMode.TRANSIT,
+              destination: { lat: dp[i + 1].lat, lng: dp[i + 1].lng },
+              travelMode: gMode,
             })
           )
         );
 
         if (cancelled) return;
+        results[day] = segResults.map((r) => r.result);
+      }
 
-        const dirResults = results.map((r) => r.result);
-        const failedCount = dirResults.filter((r) => r === null).length;
+      if (!cancelled) {
+        setMultiDayDirections(results);
 
-        if (failedCount === dirResults.length) {
-          setToastMessage("대중교통 경로를 찾지 못했어요. 직선으로 표시해요.");
-        } else if (failedCount > 0) {
+        let totalFailed = 0;
+        let totalSegments = 0;
+        for (const dayKey of Object.keys(results)) {
+          const d = Number(dayKey);
+          totalSegments += results[d].length;
+          totalFailed += results[d].filter((r) => r === null).length;
+        }
+        if (totalFailed === totalSegments && totalSegments > 0) {
+          setToastMessage("경로를 찾지 못했어요. 직선으로 표시해요.");
+        } else if (totalFailed > 0) {
           setToastMessage(
-            `${failedCount}개 구간은 대중교통 경로가 없어 직선으로 표시했어요.`
+            `${totalFailed}개 구간은 경로가 없어 직선으로 표시했어요.`
           );
         }
-
-        setSegmentDirections(dirResults);
-        setDirections(null);
-      };
-
-      fetchAll();
-      return () => {
-        cancelled = true;
-      };
-    }
-
-    // 그 외: 경유지 포함 단일 요청
-    const origin = { lat: places[0].lat, lng: places[0].lng };
-    const destination = {
-      lat: places[places.length - 1].lat,
-      lng: places[places.length - 1].lng,
-    };
-    const waypoints = places.slice(1, -1).map((p) => ({
-      location: { lat: p.lat, lng: p.lng },
-      stopover: true,
-    }));
-
-    service.route(
-      {
-        origin,
-        destination,
-        waypoints,
-        travelMode: google.maps.TravelMode[travelMode],
-        optimizeWaypoints: false,
-      },
-      (result, status) => {
-        if (cancelled) return;
-        if (status === google.maps.DirectionsStatus.OK && result) {
-          setDirections(result);
-          setSegmentDirections([]);
-        } else {
-          setDirections(null);
-          setSegmentDirections([]);
-          setToastMessage(getErrorMessage(status));
-        }
       }
-    );
+    };
 
+    calculateAllDays();
     return () => {
       cancelled = true;
     };
-  }, [isLoaded, travelMode, placesRouteKey]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [isLoaded, travelMode, selectedDay, backgroundPlacesRouteKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // backgroundPlaces를 일자별로 그룹화 (early return 전에 위치해야 훅 순서 고정)
   const placesByDay = useMemo((): Record<number, Place[]> => {
@@ -300,6 +332,44 @@ export default function TripMap({
               const isActive = selectedDay === day;
 
               if (isAllView) {
+                const dayDirs = multiDayDirections[day];
+                if (dayDirs && dayDirs.length > 0) {
+                  return (
+                    <Fragment key={`route-${day}`}>
+                      {dayDirs.map((dir, segIdx) =>
+                        dir ? (
+                          <DirectionsRenderer
+                            key={`dir-${day}-${segIdx}`}
+                            directions={dir}
+                            options={{
+                              suppressMarkers: true,
+                              polylineOptions: {
+                                strokeColor: color,
+                                strokeOpacity: 0.7,
+                                strokeWeight: 3,
+                                geodesic: true,
+                              },
+                            }}
+                          />
+                        ) : (
+                          <Polyline
+                            key={`fallback-${day}-${segIdx}`}
+                            path={[
+                              { lat: dayPlaces[segIdx].lat, lng: dayPlaces[segIdx].lng },
+                              { lat: dayPlaces[segIdx + 1].lat, lng: dayPlaces[segIdx + 1].lng },
+                            ]}
+                            options={{
+                              strokeColor: color,
+                              strokeOpacity: 0.3,
+                              strokeWeight: 2,
+                              geodesic: true,
+                            }}
+                          />
+                        )
+                      )}
+                    </Fragment>
+                  );
+                }
                 return (
                   <Polyline
                     key={`poly-${day}`}

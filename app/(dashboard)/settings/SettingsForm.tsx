@@ -1,15 +1,16 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { User, Lock, CheckCircle2, AlertCircle } from "lucide-react";
+import { User, Lock, CheckCircle2, AlertCircle, Camera } from "lucide-react";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
-import { updateProfile, updatePassword } from "./actions";
+import { updateProfile, updatePassword, uploadAvatar } from "./actions";
 
 interface SettingsFormProps {
   email: string;
   fullName: string;
+  avatarUrl: string;
 }
 
 function StatusMessage({
@@ -45,7 +46,7 @@ function StatusMessage({
   return null;
 }
 
-export default function SettingsForm({ email, fullName }: SettingsFormProps) {
+export default function SettingsForm({ email, fullName, avatarUrl }: SettingsFormProps) {
   const [profileState, profileAction, isProfilePending] = useActionState(
     updateProfile,
     undefined
@@ -54,6 +55,32 @@ export default function SettingsForm({ email, fullName }: SettingsFormProps) {
     updatePassword,
     undefined
   );
+  const [avatar, setAvatar] = useState(avatarUrl);
+  const [avatarUploading, setAvatarUploading] = useState(false);
+  const [avatarError, setAvatarError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  async function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setAvatarUploading(true);
+    setAvatarError(null);
+
+    const formData = new FormData();
+    formData.append("avatar", file);
+
+    const result = await uploadAvatar(formData);
+    setAvatarUploading(false);
+
+    if (result.error) {
+      setAvatarError(result.error);
+    } else if (result.url) {
+      setAvatar(result.url);
+    }
+
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  }
 
   return (
     <div className="space-y-6">
@@ -65,10 +92,47 @@ export default function SettingsForm({ email, fullName }: SettingsFormProps) {
           </div>
           <div>
             <h2 className="text-sm font-semibold text-black">프로필</h2>
-            <p className="text-xs text-gray-400">이름과 이메일 정보</p>
+            <p className="text-xs text-gray-400">사진, 이름, 이메일 정보</p>
           </div>
         </div>
         <form action={profileAction} className="px-6 py-5 flex flex-col gap-4">
+          {/* 아바타 */}
+          <div className="flex items-center gap-4">
+            <div className="relative group">
+              <div className="w-16 h-16 rounded-full bg-gray-100 border-2 border-gray-200 overflow-hidden flex items-center justify-center">
+                {avatar ? (
+                  <img src={avatar} alt="프로필" className="w-full h-full object-cover" />
+                ) : (
+                  <User className="w-7 h-7 text-gray-400" />
+                )}
+              </div>
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={avatarUploading}
+                className="absolute inset-0 rounded-full bg-black/0 group-hover:bg-black/40 flex items-center justify-center transition-all"
+              >
+                <Camera className="w-5 h-5 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+              </button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/png,image/jpeg,image/gif,image/webp"
+                onChange={handleAvatarChange}
+                className="hidden"
+              />
+            </div>
+            <div className="flex-1">
+              <p className="text-sm text-gray-600 font-medium">프로필 사진</p>
+              <p className="text-xs text-gray-400 mt-0.5">
+                {avatarUploading ? "업로드 중..." : "클릭하여 사진을 변경하세요 (2MB 이하)"}
+              </p>
+              {avatarError && (
+                <p className="text-xs text-red-500 mt-1">{avatarError}</p>
+              )}
+            </div>
+          </div>
+
           <Input
             id="full_name"
             name="full_name"

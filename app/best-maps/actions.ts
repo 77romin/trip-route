@@ -55,8 +55,11 @@ export async function copyTrip(
     );
   }
 
-  // 복사 횟수 증가 (security definer RPC)
-  await supabase.rpc("increment_trip_copy_count", { trip_id: tripId });
+  // 복사 횟수 증가 (직접 업데이트)
+  await supabase
+    .from("trips")
+    .update({ copy_count: (trip.copy_count ?? 0) + 1 })
+    .eq("id", tripId);
 
   revalidatePath("/best-maps");
   return { newTripId: newTrip.id as string };
@@ -86,12 +89,42 @@ export async function toggleLike(
       .eq("trip_id", tripId)
       .eq("user_id", user.id);
     if (error) return { liked: true, error: "좋아요 취소에 실패했어요." };
+
+    // like_count 감소
+    const { data: trip } = await supabase
+      .from("trips")
+      .select("like_count")
+      .eq("id", tripId)
+      .single();
+    if (trip) {
+      await supabase
+        .from("trips")
+        .update({ like_count: Math.max((trip.like_count ?? 1) - 1, 0) })
+        .eq("id", tripId);
+    }
+
+    revalidatePath("/best-maps");
     return { liked: false };
   } else {
     const { error } = await supabase
       .from("trip_likes")
       .insert({ trip_id: tripId, user_id: user.id });
     if (error) return { liked: false, error: "좋아요에 실패했어요." };
+
+    // like_count 증가
+    const { data: trip } = await supabase
+      .from("trips")
+      .select("like_count")
+      .eq("id", tripId)
+      .single();
+    if (trip) {
+      await supabase
+        .from("trips")
+        .update({ like_count: (trip.like_count ?? 0) + 1 })
+        .eq("id", tripId);
+    }
+
+    revalidatePath("/best-maps");
     return { liked: true };
   }
 }
