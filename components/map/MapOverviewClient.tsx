@@ -2,12 +2,24 @@
 
 import { useState, useMemo } from "react";
 import { useJsApiLoader } from "@react-google-maps/api";
-import { Map, MapPin, ArrowRight, CalendarDays } from "lucide-react";
+import { Map, MapPin, ArrowRight, CalendarDays, Car, Train, Bike, PersonStanding, Minus } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { GOOGLE_MAPS_LIBRARIES } from "@/lib/google-maps/config";
 import type { Place, Trip } from "@/types";
-import TripMap, { getDayColor } from "./TripMap";
+import TripMap, { type TravelMode, getDayColor } from "./TripMap";
+
+const TRAVEL_MODES: {
+  mode: TravelMode;
+  icon: React.ElementType;
+  label: string;
+}[] = [
+  { mode: "DRIVING", icon: Car, label: "자동차" },
+  { mode: "TRANSIT", icon: Train, label: "대중교통" },
+  { mode: "BICYCLING", icon: Bike, label: "자전거" },
+  { mode: "WALKING", icon: PersonStanding, label: "도보" },
+  { mode: "STRAIGHT", icon: Minus, label: "일직선" },
+];
 
 type TripSummary = Pick<Trip, "id" | "title" | "start_date" | "end_date" | "region">;
 
@@ -20,6 +32,7 @@ export default function MapOverviewClient({ trips, places }: Props) {
   const [selectedTripId, setSelectedTripId] = useState<string | null>(
     trips[0]?.id ?? null
   );
+  const [travelMode, setTravelMode] = useState<TravelMode>("DRIVING");
 
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? "",
@@ -131,8 +144,27 @@ export default function MapOverviewClient({ trips, places }: Props) {
           backgroundPlaces={tripPlaces}
           selectedDay={0}
           isLoaded={isLoaded}
-          travelMode="STRAIGHT"
+          travelMode={travelMode}
         />
+
+        {/* 이동수단 선택 (상단 중앙) */}
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10 flex items-center gap-0.5 bg-white rounded-xl border border-gray-100 shadow-lg shadow-black/5 p-1">
+          {TRAVEL_MODES.map(({ mode, icon: Icon, label }) => (
+            <button
+              key={mode}
+              onClick={() => setTravelMode(mode)}
+              title={label}
+              className={cn(
+                "w-9 h-9 rounded-lg flex items-center justify-center transition-all",
+                travelMode === mode
+                  ? "bg-black text-white"
+                  : "text-gray-400 hover:text-black hover:bg-gray-100"
+              )}
+            >
+              <Icon className="w-4 h-4" />
+            </button>
+          ))}
+        </div>
 
         {/* Day 범례 */}
         {existingDays.length > 0 && (

@@ -4,6 +4,7 @@ import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, Heart, Copy, MapPin, Calendar, User, X, Frown } from "lucide-react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { cn } from "@/lib/utils";
 import type { PublicTrip, ProfileSnippet } from "./page";
 import { copyTrip, toggleLike } from "./actions";
@@ -77,85 +78,86 @@ function TripCard({
       transition={{ duration: 0.35, delay: Math.min((rank - 1) * 0.04, 0.4) }}
       className="bg-white rounded-2xl border border-gray-100 hover:border-gray-200 hover:shadow-md hover:shadow-black/5 transition-all flex flex-col overflow-hidden group"
     >
-      {/* 썸네일 */}
-      <div className="h-36 bg-gray-100 flex items-center justify-center relative flex-shrink-0">
-        <MapPin className="w-8 h-8 text-gray-200" />
-        {trip.region && (
-          <span className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-black/80 backdrop-blur-sm text-white text-xs font-medium">
-            {trip.region}
-          </span>
-        )}
-        {rank <= 10 && (
-          <span
-            className={cn(
-              "absolute top-3 right-3 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shadow-sm",
-              rank === 1 && "bg-yellow-400 text-yellow-900",
-              rank === 2 && "bg-gray-300 text-gray-600",
-              rank === 3 && "bg-orange-300 text-orange-800",
-              rank >= 4 && rank <= 10 && "bg-white/90 text-gray-700 border border-gray-200"
-            )}
-          >
-            {rank}
-          </span>
-        )}
-      </div>
-
-      {/* 내용 */}
-      <div className="p-5 flex flex-col flex-1">
-        <h3 className="font-semibold text-black text-base mb-1 line-clamp-2 group-hover:text-gray-700 transition-colors">
-          {trip.title}
-        </h3>
-        {trip.description && (
-          <p className="text-gray-400 text-sm line-clamp-2 mb-2">
-            {trip.description}
-          </p>
-        )}
-
-        <div className="flex items-center gap-3 text-xs text-gray-400 mt-auto pt-3">
-          <span className="flex items-center gap-1">
-            <User className="w-3 h-3" />
-            {authorName}
-          </span>
-          {trip.start_date && (
-            <span className="flex items-center gap-1">
-              <Calendar className="w-3 h-3" />
-              {trip.start_date}
+      {/* 썸네일 + 내용 (클릭 시 여행 상세로 이동) */}
+      <Link href={`/trips/${trip.id}`} className="flex flex-col flex-1">
+        <div className="h-36 bg-gray-100 flex items-center justify-center relative flex-shrink-0">
+          <MapPin className="w-8 h-8 text-gray-200" />
+          {trip.region && (
+            <span className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-black/80 backdrop-blur-sm text-white text-xs font-medium">
+              {trip.region}
+            </span>
+          )}
+          {rank <= 10 && (
+            <span
+              className={cn(
+                "absolute top-3 right-3 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shadow-sm",
+                rank === 1 && "bg-yellow-400 text-yellow-900",
+                rank === 2 && "bg-gray-300 text-gray-600",
+                rank === 3 && "bg-orange-300 text-orange-800",
+                rank >= 4 && rank <= 10 && "bg-white/90 text-gray-700 border border-gray-200"
+              )}
+            >
+              {rank}
             </span>
           )}
         </div>
 
-        {/* 통계 + 액션 */}
-        <div className="flex items-center justify-between pt-4 border-t border-gray-100 mt-3">
-          <div className="flex items-center gap-3">
-            <span className="flex items-center gap-1 text-xs text-gray-400">
-              <Copy className="w-3.5 h-3.5" />
-              {trip.copy_count}
+        <div className="p-5 flex flex-col flex-1">
+          <h3 className="font-semibold text-black text-base mb-1 line-clamp-2 group-hover:text-gray-700 transition-colors">
+            {trip.title}
+          </h3>
+          {trip.description && (
+            <p className="text-gray-400 text-sm line-clamp-2 mb-2">
+              {trip.description}
+            </p>
+          )}
+
+          <div className="flex items-center gap-3 text-xs text-gray-400 mt-auto pt-3">
+            <span className="flex items-center gap-1">
+              <User className="w-3 h-3" />
+              {authorName}
             </span>
-            <button
-              onClick={onLike}
-              className={cn(
-                "flex items-center gap-1 text-xs transition-colors",
-                isLiked ? "text-black" : "text-gray-400 hover:text-black"
-              )}
-            >
-              <Heart
-                className={cn(
-                  "w-3.5 h-3.5 transition-all",
-                  isLiked && "fill-current"
-                )}
-              />
-              {likeCount}
-            </button>
+            {trip.start_date && (
+              <span className="flex items-center gap-1">
+                <Calendar className="w-3 h-3" />
+                {trip.start_date}
+              </span>
+            )}
           </div>
+        </div>
+      </Link>
+
+      {/* 통계 + 액션 */}
+      <div className="flex items-center justify-between px-5 pb-5 pt-4 border-t border-gray-100">
+        <div className="flex items-center gap-3">
+          <span className="flex items-center gap-1 text-xs text-gray-400">
+            <Copy className="w-3.5 h-3.5" />
+            {trip.copy_count}
+          </span>
           <button
-            onClick={onCopy}
-            disabled={isCopying}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-black hover:bg-gray-800 text-white text-xs font-medium transition-colors disabled:opacity-50"
+            onClick={onLike}
+            className={cn(
+              "flex items-center gap-1 text-xs transition-colors",
+              isLiked ? "text-black" : "text-gray-400 hover:text-black"
+            )}
           >
-            <Copy className="w-3 h-3" />
-            {isCopying ? "복사 중..." : "내 것으로 복사하기"}
+            <Heart
+              className={cn(
+                "w-3.5 h-3.5 transition-all",
+                isLiked && "fill-current"
+              )}
+            />
+            {likeCount}
           </button>
         </div>
+        <button
+          onClick={onCopy}
+          disabled={isCopying}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-black hover:bg-gray-800 text-white text-xs font-medium transition-colors disabled:opacity-50"
+        >
+          <Copy className="w-3 h-3" />
+          {isCopying ? "복사 중..." : "내 것으로 복사하기"}
+        </button>
       </div>
     </motion.div>
   );
