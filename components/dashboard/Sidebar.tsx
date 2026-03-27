@@ -8,6 +8,7 @@ import {
   Settings,
   LogOut,
   ChevronRight,
+  Globe,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -17,6 +18,7 @@ const NAV_ITEMS = [
   { href: "/trips", icon: List, label: "내 여행" },
   { href: "/trips/new", icon: PlusCircle, label: "새 여행" },
   { href: "/map", icon: Map, label: "한눈에 보기" },
+  { href: "/everyone-maps", icon: Globe, label: "모두의 지도" },
   { href: "/settings", icon: Settings, label: "설정" },
 ];
 

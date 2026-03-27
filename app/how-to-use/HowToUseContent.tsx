@@ -255,7 +255,7 @@ function VisualShare() {
       <div className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
         <div>
           <p className="text-black text-sm font-medium">공개 여행으로 설정</p>
-          <p className="text-gray-400 text-xs">최고의 지도에 표시됩니다</p>
+          <p className="text-gray-400 text-xs">모두의 지도에 표시됩니다</p>
         </div>
         <div className="w-11 h-6 rounded-full bg-black flex items-center justify-end px-0.5 flex-shrink-0">
           <div className="w-5 h-5 rounded-full bg-white shadow-sm" />
@@ -336,7 +336,7 @@ const STEPS = [
     icon: BookmarkCheck,
     title: "저장하고 공유하기",
     desc: "로그인 후 여행을 저장하고, 공개 설정으로 다른 여행자와 공유해 커뮤니티에 기여해보세요.",
-    points: ["로그인 후 클라우드 저장", "공개 여행으로 설정 가능", "최고의 지도 랭킹 등재"],
+    points: ["로그인 후 클라우드 저장", "공개 여행으로 설정 가능", "모두의 지도에 공개"],
     Visual: VisualShare,
   },
 ] as const;
@@ -490,9 +490,9 @@ export default function HowToUseContent() {
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </button>
               </Link>
-              <Link href="/best-maps">
+              <Link href="/everyone-maps">
                 <button className="h-14 px-8 rounded-xl border border-white/20 hover:border-white/40 text-white hover:bg-white/5 text-base font-medium transition-all w-full sm:w-auto">
-                  최고의 지도 보기
+                  모두의 지도 보기
                 </button>
               </Link>
             </div>
