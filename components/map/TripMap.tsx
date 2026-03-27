@@ -11,6 +11,35 @@ import {
 import type { Place, PlaceCategory } from "@/types";
 import type { MapPlaceInfo } from "./MapPlacePanel";
 
+// 카테고리별 Google Maps 스타일 규칙
+function getCategoryFilterStyles(category: PlaceCategory | null): google.maps.MapTypeStyle[] {
+  if (!category) return [];
+
+  // 모든 POI 숨기기
+  const hideAll: google.maps.MapTypeStyle[] = [
+    { featureType: "poi" as string, elementType: "labels", stylers: [{ visibility: "off" }] },
+  ];
+
+  switch (category) {
+    case "restaurant":
+    case "cafe":
+      return [...hideAll, { featureType: "poi.food_and_drink" as string, elementType: "labels", stylers: [{ visibility: "on" }] }];
+    case "attraction":
+      return [...hideAll, { featureType: "poi.attraction" as string, elementType: "labels", stylers: [{ visibility: "on" }] }];
+    case "hotel":
+    case "shopping":
+      return [...hideAll, { featureType: "poi.business" as string, elementType: "labels", stylers: [{ visibility: "on" }] }];
+    case "transport":
+      return [
+        ...hideAll,
+        { featureType: "transit" as string, elementType: "labels", stylers: [{ visibility: "off" }] },
+        { featureType: "transit.station" as string, elementType: "labels", stylers: [{ visibility: "on" }] },
+      ];
+    default:
+      return [];
+  }
+}
+
 export type TravelMode = "DRIVING" | "TRANSIT" | "BICYCLING" | "WALKING" | "STRAIGHT";
 export type MapLayerType = "roadmap" | "satellite" | "hybrid" | "terrain";
 
@@ -109,19 +138,20 @@ export default function TripMap({
     Record<number, (google.maps.DirectionsResult | null)[]>
   >({});
 
-  const mapOptions = useMemo<google.maps.MapOptions>(
-    () => ({
-      styles: mapLayer === "roadmap" ? GOOGLE_MAPS_LIGHT_STYLE : undefined,
+  const mapOptions = useMemo<google.maps.MapOptions>(() => {
+    const filterStyles = getCategoryFilterStyles(categoryFilter ?? null);
+    const baseStyles = mapLayer === "roadmap" ? GOOGLE_MAPS_LIGHT_STYLE : [];
+    const styles = [...baseStyles, ...filterStyles];
+    return {
+      styles: styles.length > 0 ? styles : undefined,
       mapTypeId: mapLayer,
       zoomControl: true,
       mapTypeControl: false,
       streetViewControl: false,
       fullscreenControl: true,
-      // 편집 모드에서는 더블클릭 줌 비활성화 (더블클릭으로 장소 추가 사용)
       disableDoubleClickZoom: isEditable,
-    }),
-    [mapLayer, isEditable]
-  );
+    };
+  }, [mapLayer, isEditable, categoryFilter]);
 
   // 지도 POI 단일 클릭 → Places API 상세조회 → 콜백
   function handleMapClick(e: google.maps.MapMouseEvent) {
@@ -451,8 +481,6 @@ export default function TripMap({
             {Object.keys(placesByDay).map((key) =>
               placesByDay[Number(key)].map((place, i) => {
                 const day = Number(key);
-                // 카테고리 필터 적용
-                if (categoryFilter && place.category !== categoryFilter) return null;
                 const color = getDayColor(day);
                 const isAllView = selectedDay === 0;
                 const isActive = selectedDay === day;
@@ -553,7 +581,6 @@ export default function TripMap({
           // ── 단일 모드 (하위 호환) ──────────────────────────────────
           <>
             {places.map((place, i) => {
-              if (categoryFilter && place.category !== categoryFilter) return null;
               const markerFillColor = isSatellite ? "#ffffff" : "#000000";
               const markerLabelColor = isSatellite ? "#000000" : "#ffffff";
               const markerStrokeColor = isSatellite ? "#000000" : "#ffffff";

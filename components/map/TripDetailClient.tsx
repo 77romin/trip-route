@@ -166,16 +166,6 @@ export default function TripDetailClient({ trip, initialPlaces, isPublicView }: 
     [places, selectedDay]
   );
 
-  // 카테고리 필터 적용된 사이드바 장소
-  const filteredDayPlaces = useMemo(
-    () => categoryFilter ? dayPlaces.filter((p) => p.category === categoryFilter) : dayPlaces,
-    [dayPlaces, categoryFilter]
-  );
-
-  const filteredAllPlaces = useMemo(
-    () => categoryFilter ? places.filter((p) => p.category === categoryFilter) : places,
-    [places, categoryFilter]
-  );
 
   // 전체 보기용: 일자별 그룹
   const placesByDay = useMemo((): Record<number, Place[]> => {
@@ -400,7 +390,7 @@ export default function TripDetailClient({ trip, initialPlaces, isPublicView }: 
         <div className="flex-1 overflow-y-auto px-3 py-3">
           {selectedDay === 0 ? (
             // 전체 보기: 일자별 그룹
-            filteredAllPlaces.length === 0 ? (
+            places.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-full py-12 text-center">
                 <div className="w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center mb-3">
                   <MapPin className="w-5 h-5 text-gray-300" />
@@ -412,12 +402,7 @@ export default function TripDetailClient({ trip, initialPlaces, isPublicView }: 
                 {Object.keys(placesByDay)
                   .map(Number)
                   .sort((a, b) => a - b)
-                  .map((day) => {
-                    const filtered = placesByDay[day].filter(
-                      (p) => !categoryFilter || p.category === categoryFilter
-                    );
-                    if (!filtered.length) return null;
-                    return (
+                  .map((day) => (
                     <div key={day}>
                       <div className="flex items-center gap-2 px-1 mb-2">
                         <div
@@ -429,7 +414,7 @@ export default function TripDetailClient({ trip, initialPlaces, isPublicView }: 
                         </span>
                       </div>
                       <div className="flex flex-col gap-2">
-                        {filtered.map((place, i) => (
+                        {placesByDay[day].map((place, i) => (
                           <PlaceCard
                             key={place.id}
                             place={place}
@@ -440,8 +425,7 @@ export default function TripDetailClient({ trip, initialPlaces, isPublicView }: 
                         ))}
                       </div>
                     </div>
-                    );
-                  })}
+                  ))}
               </div>
             )
           ) : dayPlaces.length === 0 ? (
@@ -458,7 +442,7 @@ export default function TripDetailClient({ trip, initialPlaces, isPublicView }: 
             </div>
           ) : isPublicView ? (
             <div className="flex flex-col gap-2">
-              {filteredDayPlaces.map((place, index) => (
+              {dayPlaces.map((place, index) => (
                 <PlaceCard
                   key={place.id}
                   place={place}
@@ -470,11 +454,11 @@ export default function TripDetailClient({ trip, initialPlaces, isPublicView }: 
           ) : (
             <Reorder.Group
               axis="y"
-              values={filteredDayPlaces}
+              values={dayPlaces}
               onReorder={handleReorder}
               className="flex flex-col gap-2"
             >
-              {filteredDayPlaces.map((place, index) => (
+              {dayPlaces.map((place, index) => (
                 <DraggablePlaceCard
                   key={place.id}
                   place={place}
