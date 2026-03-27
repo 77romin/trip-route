@@ -9,20 +9,49 @@ export const metadata: Metadata = {
 
 const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? "";
 
-function buildStaticMapUrl(places: { lat: number; lng: number }[]): string | null {
+// 일자별 무지개색 (빨주노초파남보)
+const DAY_COLORS = [
+  "FF3333", // Day 1: 빨강
+  "FF8C00", // Day 2: 주황
+  "FFD700", // Day 3: 노랑
+  "33BB33", // Day 4: 초록
+  "3388FF", // Day 5: 파랑
+  "5544DD", // Day 6: 남색
+  "AA44CC", // Day 7: 보라
+];
+
+function buildStaticMapUrl(
+  places: { lat: number; lng: number; day: number; order: number }[]
+): string | null {
   if (!places.length || !API_KEY) return null;
 
-  const sorted = places.slice(0, 20);
-  const markerParams = sorted
-    .map((p) => `markers=size:small%7Ccolor:0x000000%7C${p.lat},${p.lng}`)
-    .join("&");
-  const pathCoords = sorted.map((p) => `${p.lat},${p.lng}`).join("|");
-  const pathParam =
-    sorted.length > 1
-      ? `&path=color:0x000000ff%7Cweight:3%7C${encodeURIComponent(pathCoords)}`
-      : "";
+  const sorted = [...places]
+    .sort((a, b) => a.day - b.day || a.order - b.order)
+    .slice(0, 25);
 
-  return `https://maps.googleapis.com/maps/api/staticmap?size=400x200&scale=2&maptype=roadmap&${markerParams}${pathParam}&key=${API_KEY}`;
+  // 일자별 그룹핑
+  const dayGroups = new Map<number, typeof sorted>();
+  for (const p of sorted) {
+    if (!dayGroups.has(p.day)) dayGroups.set(p.day, []);
+    dayGroups.get(p.day)!.push(p);
+  }
+
+  const parts: string[] = ["size=400x200", "scale=2", "maptype=roadmap"];
+  let colorIdx = 0;
+
+  for (const dayPlaces of dayGroups.values()) {
+    const hex = DAY_COLORS[colorIdx % DAY_COLORS.length];
+    if (dayPlaces.length > 1) {
+      const coords = dayPlaces.map((p) => `${p.lat},${p.lng}`).join("|");
+      parts.push(`path=color:0x${hex}ff|weight:3|${coords}`);
+    }
+    const markerCoords = dayPlaces.map((p) => `${p.lat},${p.lng}`).join("|");
+    parts.push(`markers=size:small|color:0x${hex}|${markerCoords}`);
+    colorIdx++;
+  }
+
+  parts.push(`key=${API_KEY}`);
+  return `https://maps.googleapis.com/maps/api/staticmap?${parts.join("&")}`;
 }
 
 export default async function TripsPage() {
@@ -64,8 +93,7 @@ export default async function TripsPage() {
       ) : (
         <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-5">
           {trips.map((trip) => {
-            const places = ((trip.places ?? []) as { lat: number; lng: number; day: number; order: number }[])
-              .sort((a, b) => a.day - b.day || a.order - b.order);
+            const places = (trip.places ?? []) as { lat: number; lng: number; day: number; order: number }[];
             const mapUrl = buildStaticMapUrl(places);
             return (
               <TripCard key={trip.id as string} trip={trip} mapUrl={mapUrl} />
