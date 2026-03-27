@@ -628,7 +628,7 @@ export default function TripMap({
                         mapPaneName="floatPane"
                       >
                         <div
-                          style={{ transform: "translate(-50%, -50%)" }}
+                          style={{ transform: "translate(-50%, -50%)", width: "max-content" }}
                           className="bg-black/60 rounded px-2 py-0.5 text-[11px] font-bold text-white whitespace-nowrap pointer-events-none"
                         >
                           {formatDuration(secs)}
