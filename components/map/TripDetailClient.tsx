@@ -1,8 +1,8 @@
 "use client";
 
-import { useRef, useState, useMemo, useTransition } from "react";
+import { useRef, useState, useMemo, useTransition, useEffect } from "react";
 import { useJsApiLoader } from "@react-google-maps/api";
-import { AnimatePresence, Reorder, useDragControls } from "framer-motion";
+import { AnimatePresence, Reorder, useDragControls, motion } from "framer-motion";
 import {
   ArrowLeft,
   Plus,
@@ -17,6 +17,8 @@ import {
   Layers,
   Mountain,
   Copy,
+  ChevronLeft,
+  ChevronRight,
   UtensilsCrossed,
   Coffee,
   Building2,
@@ -134,6 +136,17 @@ export default function TripDetailClient({ trip, initialPlaces, isPublicView }: 
   const [isCopying, setIsCopying] = useState(false);
   const [categoryFilter, setCategoryFilter] = useState<PlaceCategory | null>(null);
   const [mapClickPlace, setMapClickPlace] = useState<MapPlaceInfo | null>(null);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+
+  // 창 크기에 따라 사이드바 자동 토글
+  useEffect(() => {
+    function onResize() {
+      setSidebarOpen(window.innerWidth >= 768);
+    }
+    onResize();
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
   const [, startTransition] = useTransition();
   const reorderTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -303,7 +316,11 @@ export default function TripDetailClient({ trip, initialPlaces, isPublicView }: 
   return (
     <div className="flex h-full overflow-hidden">
       {/* 좌측 패널 */}
-      <div className="w-[380px] flex-shrink-0 flex flex-col border-r border-gray-100 bg-white overflow-hidden">
+      <motion.div
+        animate={{ width: sidebarOpen ? 380 : 0 }}
+        transition={{ duration: 0.28, ease: "easeInOut" }}
+        className="flex-shrink-0 flex flex-col border-r border-gray-100 bg-white overflow-hidden"
+      >
         {/* 헤더 */}
         <div className="px-5 pt-5 pb-4 border-b border-gray-100">
           {isPublicView ? (
@@ -484,10 +501,21 @@ export default function TripDetailClient({ trip, initialPlaces, isPublicView }: 
             </button>
           </div>
         )}
-      </div>
+      </motion.div>
 
       {/* 지도 영역 */}
       <div className="flex-1 relative">
+        {/* 사이드바 토글 버튼 */}
+        <button
+          onClick={() => setSidebarOpen((v) => !v)}
+          className="absolute left-0 top-1/2 -translate-y-1/2 z-20 w-6 h-16 bg-white border border-l-0 border-gray-200 rounded-r-xl flex items-center justify-center hover:bg-gray-50 transition-colors shadow-md"
+        >
+          {sidebarOpen ? (
+            <ChevronLeft className="w-3.5 h-3.5 text-gray-500" />
+          ) : (
+            <ChevronRight className="w-3.5 h-3.5 text-gray-500" />
+          )}
+        </button>
         <TripMap
           places={dayPlaces}
           backgroundPlaces={places}
@@ -502,7 +530,7 @@ export default function TripDetailClient({ trip, initialPlaces, isPublicView }: 
         />
 
         {/* 카테고리 필터 (상단 왼쪽) */}
-        <div className="absolute top-4 left-4 z-10 flex items-center gap-1.5 bg-white rounded-xl border border-gray-100 shadow-lg shadow-black/5 px-2 py-1.5 overflow-x-auto max-w-[calc(50%-2rem)]">
+        <div className="absolute top-4 left-10 z-10 flex items-center gap-1.5 bg-white rounded-xl border border-gray-100 shadow-lg shadow-black/5 px-2 py-1.5 overflow-x-auto max-w-[calc(50%-2rem)]">
           {CATEGORY_FILTERS.map(({ value, icon: Icon, label }) => (
             <button
               key={String(value)}
