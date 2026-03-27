@@ -42,13 +42,16 @@ async function callAI(provider: AiProvider, apiKey: string, prompt: string): Pro
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
           contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { maxOutputTokens: 4096 },
+          generationConfig: { maxOutputTokens: 8192 },
         }),
       }
     );
     const data = await res.json();
     if (!res.ok) throw new Error(data.error?.message ?? "Gemini API 오류");
-    return data.candidates[0].content.parts[0].text;
+    // gemini-2.5-flash는 thinking 기능으로 parts가 여러 개 — thought=true가 아닌 마지막 텍스트 사용
+    const parts = data.candidates[0].content.parts as { text?: string; thought?: boolean }[];
+    const responsePart = parts.filter((p) => !p.thought && p.text).pop() ?? parts[parts.length - 1];
+    return responsePart?.text ?? "";
   }
 
   if (provider === "chatgpt") {
