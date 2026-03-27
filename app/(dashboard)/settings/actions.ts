@@ -64,6 +64,22 @@ export async function uploadAvatar(
   return { url: publicUrl };
 }
 
+export async function saveAiSettings(
+  _prev: ActionState,
+  formData: FormData
+): Promise<ActionState> {
+  const supabase = await createClient();
+  const provider = formData.get("ai_provider") as string;
+  const apiKey = formData.get("ai_api_key") as string;
+
+  const { error } = await supabase.auth.updateUser({
+    data: { ai_provider: provider || null, ai_api_key: apiKey || null },
+  });
+
+  if (error) return { error: error.message };
+  return { success: true };
+}
+
 export async function updatePassword(
   _prev: ActionState,
   formData: FormData
