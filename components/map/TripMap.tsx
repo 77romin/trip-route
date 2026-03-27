@@ -8,7 +8,8 @@ import {
   GOOGLE_MAPS_DEFAULT_ZOOM,
   GOOGLE_MAPS_LIGHT_STYLE,
 } from "@/lib/google-maps/config";
-import type { Place } from "@/types";
+import type { Place, PlaceCategory } from "@/types";
+import type { MapPlaceInfo } from "./MapPlacePanel";
 
 export type TravelMode = "DRIVING" | "TRANSIT" | "BICYCLING" | "WALKING" | "STRAIGHT";
 export type MapLayerType = "roadmap" | "satellite" | "hybrid" | "terrain";
@@ -48,6 +49,10 @@ interface TripMapProps {
   isEditable?: boolean;
   /** 더블클릭 위치 Geocoding 완료 후 호출 */
   onDblClickPlace?: (info: DblClickPlaceInfo) => void;
+  /** 지도 POI 클릭 시 Places API 조회 후 호출 */
+  onMapPlaceClick?: (info: MapPlaceInfo) => void;
+  /** 마커 카테고리 필터 (null = 전체) */
+  categoryFilter?: PlaceCategory | null;
 }
 
 const MAP_CONTAINER_STYLE = { width: "100%", height: "100%" };
@@ -91,6 +96,8 @@ export default function TripMap({
   mapLayer = "roadmap",
   isEditable = false,
   onDblClickPlace,
+  onMapPlaceClick,
+  categoryFilter,
 }: TripMapProps) {
   const [directions, setDirections] =
     useState<google.maps.DirectionsResult | null>(null);
@@ -115,6 +122,43 @@ export default function TripMap({
     }),
     [mapLayer, isEditable]
   );
+
+  // 지도 POI 단일 클릭 → Places API 상세조회 → 콜백
+  function handleMapClick(e: google.maps.MapMouseEvent) {
+    const placeId = (e as google.maps.MapMouseEvent & { placeId?: string }).placeId;
+    if (!placeId || !onMapPlaceClick) return;
+    // 기본 Google 정보창 억제
+    (e as { stop?: () => void }).stop?.();
+
+    if (typeof window === "undefined" || !window.google?.maps?.places) return;
+    const service = new window.google.maps.places.PlacesService(document.createElement("div"));
+    service.getDetails(
+      {
+        placeId,
+        fields: ["name", "formatted_address", "geometry", "photos", "rating", "user_ratings_total", "formatted_phone_number", "website", "url", "types"],
+      },
+      (result, status) => {
+        if (status !== window.google.maps.places.PlacesServiceStatus.OK || !result) return;
+        const photos = (result.photos ?? []).slice(0, 5).map((p) => p.getUrl({ maxWidth: 400, maxHeight: 300 }));
+        const loc = result.geometry?.location;
+        if (!loc) return;
+        onMapPlaceClick({
+          name: result.name ?? "",
+          address: result.formatted_address ?? "",
+          lat: loc.lat(),
+          lng: loc.lng(),
+          placeId,
+          types: result.types,
+          photos,
+          rating: result.rating,
+          userRatingsTotal: result.user_ratings_total,
+          phone: result.formatted_phone_number,
+          website: result.website,
+          mapsUrl: result.url,
+        });
+      }
+    );
+  }
 
   // 더블클릭 → Geocoding → 콜백
   function handleMapDblClick(e: google.maps.MapMouseEvent) {
@@ -318,6 +362,7 @@ export default function TripMap({
         center={center}
         zoom={GOOGLE_MAPS_DEFAULT_ZOOM}
         options={mapOptions}
+        onClick={onMapPlaceClick ? handleMapClick : undefined}
         onDblClick={isEditable ? handleMapDblClick : undefined}
       >
         {isMultiDay ? (
@@ -406,6 +451,8 @@ export default function TripMap({
             {Object.keys(placesByDay).map((key) =>
               placesByDay[Number(key)].map((place, i) => {
                 const day = Number(key);
+                // 카테고리 필터 적용
+                if (categoryFilter && place.category !== categoryFilter) return null;
                 const color = getDayColor(day);
                 const isAllView = selectedDay === 0;
                 const isActive = selectedDay === day;
@@ -506,6 +553,7 @@ export default function TripMap({
           // ── 단일 모드 (하위 호환) ──────────────────────────────────
           <>
             {places.map((place, i) => {
+              if (categoryFilter && place.category !== categoryFilter) return null;
               const markerFillColor = isSatellite ? "#ffffff" : "#000000";
               const markerLabelColor = isSatellite ? "#000000" : "#ffffff";
               const markerStrokeColor = isSatellite ? "#000000" : "#ffffff";

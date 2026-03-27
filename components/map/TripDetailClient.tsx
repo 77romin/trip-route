@@ -17,17 +17,22 @@ import {
   Layers,
   Mountain,
   Copy,
+  UtensilsCrossed,
+  Coffee,
+  Building2,
+  ShoppingBag,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { GOOGLE_MAPS_LIBRARIES } from "@/lib/google-maps/config";
-import type { Trip, Place } from "@/types";
+import type { Trip, Place, PlaceCategory } from "@/types";
 import TripMap, { type TravelMode, type MapLayerType, type DblClickPlaceInfo, getDayColor } from "./TripMap";
 import PlaceSearch from "./PlaceSearch";
 import PlaceCard from "./PlaceCard";
 import PlaceDetailPanel from "./PlaceDetailPanel";
 import MapClickConfirm from "./MapClickConfirm";
+import MapPlacePanel, { type MapPlaceInfo } from "./MapPlacePanel";
 import {
   addPlace,
   removePlace,
@@ -64,6 +69,27 @@ const MAP_LAYERS: {
   { type: "hybrid", icon: Layers, label: "하이브리드" },
   { type: "terrain", icon: Mountain, label: "지형" },
 ];
+
+const CATEGORY_FILTERS: { value: PlaceCategory | null; icon: React.ElementType | null; label: string }[] = [
+  { value: null, icon: null, label: "전체" },
+  { value: "attraction", icon: MapPin, label: "명소" },
+  { value: "restaurant", icon: UtensilsCrossed, label: "식당" },
+  { value: "cafe", icon: Coffee, label: "카페" },
+  { value: "hotel", icon: Building2, label: "숙소" },
+  { value: "transport", icon: Car, label: "교통" },
+  { value: "shopping", icon: ShoppingBag, label: "쇼핑" },
+];
+
+function guessCategory(types?: string[]): PlaceCategory {
+  if (!types?.length) return "other";
+  if (types.some((t) => ["restaurant", "food", "meal_takeaway", "meal_delivery"].includes(t))) return "restaurant";
+  if (types.some((t) => ["cafe", "bakery"].includes(t))) return "cafe";
+  if (types.some((t) => ["lodging"].includes(t))) return "hotel";
+  if (types.some((t) => ["transit_station", "bus_station", "airport", "train_station", "subway_station"].includes(t))) return "transport";
+  if (types.some((t) => ["shopping_mall", "store", "clothing_store", "department_store"].includes(t))) return "shopping";
+  if (types.some((t) => ["tourist_attraction", "museum", "park", "amusement_park", "natural_feature"].includes(t))) return "attraction";
+  return "other";
+}
 
 function DraggablePlaceCard({
   place,
@@ -106,6 +132,8 @@ export default function TripDetailClient({ trip, initialPlaces, isPublicView }: 
   const [travelMode, setTravelMode] = useState<TravelMode>("DRIVING");
   const [mapLayer, setMapLayer] = useState<MapLayerType>("roadmap");
   const [isCopying, setIsCopying] = useState(false);
+  const [categoryFilter, setCategoryFilter] = useState<PlaceCategory | null>(null);
+  const [mapClickPlace, setMapClickPlace] = useState<MapPlaceInfo | null>(null);
   const [, startTransition] = useTransition();
   const reorderTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -136,6 +164,17 @@ export default function TripDetailClient({ trip, initialPlaces, isPublicView }: 
             .sort((a, b) => a.order - b.order)
         : [],
     [places, selectedDay]
+  );
+
+  // 카테고리 필터 적용된 사이드바 장소
+  const filteredDayPlaces = useMemo(
+    () => categoryFilter ? dayPlaces.filter((p) => p.category === categoryFilter) : dayPlaces,
+    [dayPlaces, categoryFilter]
+  );
+
+  const filteredAllPlaces = useMemo(
+    () => categoryFilter ? places.filter((p) => p.category === categoryFilter) : places,
+    [places, categoryFilter]
   );
 
   // 전체 보기용: 일자별 그룹
@@ -170,6 +209,28 @@ export default function TripDetailClient({ trip, initialPlaces, isPublicView }: 
       } catch {
         setPlaces((prev) => prev.filter((p) => p.id !== tempId));
       }
+    });
+  }
+
+  function handleMapPlaceClick(info: MapPlaceInfo) {
+    setSelectedPlace(null);
+    setMapClickPlace(info);
+  }
+
+  function handleAddFromMap(day: number) {
+    if (!mapClickPlace) return;
+    const dayPlacesForDay = places.filter((p) => p.day === day);
+    handleAddPlace({
+      name: mapClickPlace.name,
+      address: mapClickPlace.address,
+      lat: mapClickPlace.lat,
+      lng: mapClickPlace.lng,
+      day,
+      order: dayPlacesForDay.length,
+      category: guessCategory(mapClickPlace.types),
+      duration_minutes: undefined,
+      notes: undefined,
+      google_place_id: mapClickPlace.placeId,
     });
   }
 
@@ -339,7 +400,7 @@ export default function TripDetailClient({ trip, initialPlaces, isPublicView }: 
         <div className="flex-1 overflow-y-auto px-3 py-3">
           {selectedDay === 0 ? (
             // 전체 보기: 일자별 그룹
-            places.length === 0 ? (
+            filteredAllPlaces.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-full py-12 text-center">
                 <div className="w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center mb-3">
                   <MapPin className="w-5 h-5 text-gray-300" />
@@ -351,7 +412,12 @@ export default function TripDetailClient({ trip, initialPlaces, isPublicView }: 
                 {Object.keys(placesByDay)
                   .map(Number)
                   .sort((a, b) => a - b)
-                  .map((day) => (
+                  .map((day) => {
+                    const filtered = placesByDay[day].filter(
+                      (p) => !categoryFilter || p.category === categoryFilter
+                    );
+                    if (!filtered.length) return null;
+                    return (
                     <div key={day}>
                       <div className="flex items-center gap-2 px-1 mb-2">
                         <div
@@ -363,18 +429,19 @@ export default function TripDetailClient({ trip, initialPlaces, isPublicView }: 
                         </span>
                       </div>
                       <div className="flex flex-col gap-2">
-                        {placesByDay[day].map((place, i) => (
+                        {filtered.map((place, i) => (
                           <PlaceCard
                             key={place.id}
                             place={place}
                             index={i + 1}
                             onRemove={isPublicView ? undefined : () => handleRemovePlace(place.id)}
-                            onClick={() => setSelectedPlace(place)}
+                            onClick={() => { setMapClickPlace(null); setSelectedPlace(place); }}
                           />
                         ))}
                       </div>
                     </div>
-                  ))}
+                    );
+                  })}
               </div>
             )
           ) : dayPlaces.length === 0 ? (
@@ -391,29 +458,29 @@ export default function TripDetailClient({ trip, initialPlaces, isPublicView }: 
             </div>
           ) : isPublicView ? (
             <div className="flex flex-col gap-2">
-              {dayPlaces.map((place, index) => (
+              {filteredDayPlaces.map((place, index) => (
                 <PlaceCard
                   key={place.id}
                   place={place}
                   index={index + 1}
-                  onClick={() => setSelectedPlace(place)}
+                  onClick={() => { setMapClickPlace(null); setSelectedPlace(place); }}
                 />
               ))}
             </div>
           ) : (
             <Reorder.Group
               axis="y"
-              values={dayPlaces}
+              values={filteredDayPlaces}
               onReorder={handleReorder}
               className="flex flex-col gap-2"
             >
-              {dayPlaces.map((place, index) => (
+              {filteredDayPlaces.map((place, index) => (
                 <DraggablePlaceCard
                   key={place.id}
                   place={place}
                   index={index + 1}
                   onRemove={() => handleRemovePlace(place.id)}
-                  onClick={() => setSelectedPlace(place)}
+                  onClick={() => { setMapClickPlace(null); setSelectedPlace(place); }}
                 />
               ))}
             </Reorder.Group>
@@ -446,7 +513,28 @@ export default function TripDetailClient({ trip, initialPlaces, isPublicView }: 
           mapLayer={mapLayer}
           isEditable={selectedDay > 0 && !isPublicView}
           onDblClickPlace={isPublicView ? undefined : handleDblClickPlace}
+          onMapPlaceClick={handleMapPlaceClick}
+          categoryFilter={categoryFilter}
         />
+
+        {/* 카테고리 필터 (상단 왼쪽) */}
+        <div className="absolute top-4 left-4 z-10 flex items-center gap-1.5 bg-white rounded-xl border border-gray-100 shadow-lg shadow-black/5 px-2 py-1.5 overflow-x-auto max-w-[calc(50%-2rem)]">
+          {CATEGORY_FILTERS.map(({ value, icon: Icon, label }) => (
+            <button
+              key={String(value)}
+              onClick={() => setCategoryFilter(value)}
+              className={cn(
+                "flex-shrink-0 flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium transition-all whitespace-nowrap",
+                categoryFilter === value
+                  ? "bg-black text-white"
+                  : "text-gray-500 hover:text-black hover:bg-gray-100"
+              )}
+            >
+              {Icon && <Icon className="w-3 h-3" />}
+              {label}
+            </button>
+          ))}
+        </div>
 
         {/* 이동 수단 선택 (상단 중앙) */}
         <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10 flex items-center gap-0.5 bg-white rounded-xl border border-gray-100 shadow-lg shadow-black/5 p-1">
@@ -525,6 +613,21 @@ export default function TripDetailClient({ trip, initialPlaces, isPublicView }: 
             onUpdate={handleUpdatePlace}
             readOnly={isPublicView}
             isLoaded={isLoaded}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* 지도 클릭 장소 패널 */}
+      <AnimatePresence>
+        {mapClickPlace && (
+          <MapPlacePanel
+            key={mapClickPlace.placeId ?? mapClickPlace.name}
+            info={mapClickPlace}
+            dayCount={dayCount}
+            onClose={() => setMapClickPlace(null)}
+            onAdd={isPublicView ? undefined : (day) => {
+              handleAddFromMap(day);
+            }}
           />
         )}
       </AnimatePresence>
