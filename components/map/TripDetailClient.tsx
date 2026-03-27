@@ -23,6 +23,8 @@ import {
   Coffee,
   Building2,
   ShoppingBag,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -40,6 +42,7 @@ import {
   removePlace,
   reorderPlaces,
   updatePlace,
+  toggleTripPublic,
 } from "@/app/(dashboard)/trips/[id]/actions";
 import { copyTrip } from "@/app/best-maps/actions";
 
@@ -137,6 +140,8 @@ export default function TripDetailClient({ trip, initialPlaces, isPublicView }: 
   const [categoryFilter, setCategoryFilter] = useState<PlaceCategory | null>(null);
   const [mapClickPlace, setMapClickPlace] = useState<MapPlaceInfo | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [isPublic, setIsPublic] = useState(trip.is_public);
+  const [isTogglingPublic, setIsTogglingPublic] = useState(false);
 
   // 창 크기에 따라 사이드바 자동 토글
   useEffect(() => {
@@ -158,6 +163,18 @@ export default function TripDetailClient({ trip, initialPlaces, isPublicView }: 
       alert(result.error);
     } else if (result.newTripId) {
       router.push(`/trips/${result.newTripId}`);
+    }
+  }
+
+  async function handleTogglePublic() {
+    setIsTogglingPublic(true);
+    try {
+      await toggleTripPublic(trip.id, !isPublic);
+      setIsPublic((v) => !v);
+    } catch {
+      // 실패 시 무시
+    } finally {
+      setIsTogglingPublic(false);
     }
   }
 
@@ -352,6 +369,30 @@ export default function TripDetailClient({ trip, initialPlaces, isPublicView }: 
             <p className="text-gray-300 text-xs mt-2">
               {trip.start_date ?? "?"} ~ {trip.end_date ?? "?"}
             </p>
+          )}
+          {!isPublicView && (
+            <button
+              onClick={handleTogglePublic}
+              disabled={isTogglingPublic}
+              className={cn(
+                "mt-3 w-full flex items-center justify-center gap-2 py-2 rounded-xl text-xs font-medium border transition-all disabled:opacity-50",
+                isPublic
+                  ? "border-green-200 text-green-600 bg-green-50 hover:bg-green-100"
+                  : "border-gray-200 text-gray-500 hover:border-gray-400 hover:text-black bg-white"
+              )}
+            >
+              {isPublic ? (
+                <>
+                  <Eye className="w-3.5 h-3.5" />
+                  모두의 지도에 공개 중
+                </>
+              ) : (
+                <>
+                  <EyeOff className="w-3.5 h-3.5" />
+                  모두의 지도에 공개하기
+                </>
+              )}
+            </button>
           )}
           {isPublicView && (
             <button

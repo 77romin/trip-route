@@ -102,6 +102,7 @@ export default function Navbar() {
           {[
             { label: "나의 지도", href: "/trips" },
             { label: "최고의 지도", href: "/best-maps" },
+            { label: "모두의 지도", href: "/everyone-maps" },
             { label: "사용법", href: "/how-to-use" },
           ].map(({ label, href }) => (
             <Link

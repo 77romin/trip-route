@@ -60,3 +60,16 @@ export async function updatePlace(
   if (error) throw new Error(error.message);
   revalidatePath(`/trips/${tripId}`);
 }
+
+export async function toggleTripPublic(tripId: string, isPublic: boolean) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error("로그인이 필요합니다.");
+  const { error } = await supabase
+    .from("trips")
+    .update({ is_public: isPublic })
+    .eq("id", tripId)
+    .eq("user_id", user.id);
+  if (error) throw new Error(error.message);
+  revalidatePath(`/trips/${tripId}`);
+}
