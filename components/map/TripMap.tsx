@@ -629,7 +629,7 @@ export default function TripMap({
                       >
                         <div
                           style={{ transform: "translate(-50%, -50%)" }}
-                          className="bg-white rounded-full px-2.5 py-1 text-[11px] font-semibold shadow-md text-gray-600 whitespace-nowrap border border-gray-100 pointer-events-none"
+                          className="bg-black/60 rounded px-2 py-0.5 text-[11px] font-bold text-white whitespace-nowrap pointer-events-none"
                         >
                           {formatDuration(secs)}
                         </div>
