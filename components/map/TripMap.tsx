@@ -12,39 +12,49 @@ import type { Place, PlaceCategory } from "@/types";
 import type { MapPlaceInfo } from "./MapPlacePanel";
 
 // 카테고리별 Google Maps 스타일 규칙
-// elementType 미지정 = geometry + labels 모두 적용 (일부 POI가 labels만으로 숨겨지지 않음)
+// elementType: "labels" 만 조작 → geometry(공원 초록색, 건물 배경 등)는 유지하면서 아이콘·텍스트만 필터링
 function getCategoryFilterStyles(category: PlaceCategory | null): google.maps.MapTypeStyle[] {
   if (!category) return [];
 
-  // 모든 POI + 하위 타입 명시적으로 숨기기
-  const hideAll: google.maps.MapTypeStyle[] = [
-    { featureType: "poi", stylers: [{ visibility: "off" }] },
-    { featureType: "poi.attraction", stylers: [{ visibility: "off" }] },
-    { featureType: "poi.business", stylers: [{ visibility: "off" }] },
-    { featureType: "poi.food_and_drink", stylers: [{ visibility: "off" }] },
-    { featureType: "poi.government", stylers: [{ visibility: "off" }] },
-    { featureType: "poi.medical", stylers: [{ visibility: "off" }] },
-    { featureType: "poi.park", stylers: [{ visibility: "off" }] },
-    { featureType: "poi.place_of_worship", stylers: [{ visibility: "off" }] },
-    { featureType: "poi.school", stylers: [{ visibility: "off" }] },
-    { featureType: "poi.sports_complex", stylers: [{ visibility: "off" }] },
+  // POI 아이콘·텍스트만 숨기고 배경 geometry는 유지
+  const hideAllLabels: google.maps.MapTypeStyle[] = [
+    { featureType: "poi", elementType: "labels.icon", stylers: [{ visibility: "off" }] },
+    { featureType: "poi", elementType: "labels.text", stylers: [{ visibility: "off" }] },
   ];
 
   switch (category) {
     case "restaurant":
     case "cafe":
-      return [...hideAll, { featureType: "poi.food_and_drink", stylers: [{ visibility: "on" }] }];
+      return [
+        ...hideAllLabels,
+        { featureType: "poi.food_and_drink", elementType: "labels.icon", stylers: [{ visibility: "on" }] },
+        { featureType: "poi.food_and_drink", elementType: "labels.text", stylers: [{ visibility: "on" }] },
+      ];
     case "attraction":
-      return [...hideAll, { featureType: "poi.attraction", stylers: [{ visibility: "on" }] }];
+      return [
+        ...hideAllLabels,
+        { featureType: "poi.attraction", elementType: "labels.icon", stylers: [{ visibility: "on" }] },
+        { featureType: "poi.attraction", elementType: "labels.text", stylers: [{ visibility: "on" }] },
+        { featureType: "poi.park", elementType: "labels.icon", stylers: [{ visibility: "on" }] },
+        { featureType: "poi.park", elementType: "labels.text", stylers: [{ visibility: "on" }] },
+      ];
     case "hotel":
-      return [...hideAll, { featureType: "poi.business", stylers: [{ visibility: "on" }] }];
+      return [
+        ...hideAllLabels,
+        { featureType: "poi.business", elementType: "labels.icon", stylers: [{ visibility: "on" }] },
+        { featureType: "poi.business", elementType: "labels.text", stylers: [{ visibility: "on" }] },
+      ];
     case "shopping":
-      return [...hideAll, { featureType: "poi.business", stylers: [{ visibility: "on" }] }];
+      return [
+        ...hideAllLabels,
+        { featureType: "poi.business", elementType: "labels.icon", stylers: [{ visibility: "on" }] },
+        { featureType: "poi.business", elementType: "labels.text", stylers: [{ visibility: "on" }] },
+      ];
     case "transport":
       return [
-        ...hideAll,
-        { featureType: "transit", stylers: [{ visibility: "off" }] },
-        { featureType: "transit.station", stylers: [{ visibility: "on" }] },
+        ...hideAllLabels,
+        { featureType: "transit.station", elementType: "labels.icon", stylers: [{ visibility: "on" }] },
+        { featureType: "transit.station", elementType: "labels.text", stylers: [{ visibility: "on" }] },
       ];
     default:
       return [];
