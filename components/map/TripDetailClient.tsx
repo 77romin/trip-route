@@ -16,8 +16,10 @@ import {
   Globe,
   Layers,
   Mountain,
+  Copy,
 } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { GOOGLE_MAPS_LIBRARIES } from "@/lib/google-maps/config";
 import type { Trip, Place } from "@/types";
@@ -32,10 +34,12 @@ import {
   reorderPlaces,
   updatePlace,
 } from "@/app/(dashboard)/trips/[id]/actions";
+import { copyTrip } from "@/app/best-maps/actions";
 
 interface Props {
   trip: Trip;
   initialPlaces: Place[];
+  isPublicView?: boolean;
 }
 
 const TRAVEL_MODES: {
@@ -91,7 +95,8 @@ function DraggablePlaceCard({
   );
 }
 
-export default function TripDetailClient({ trip, initialPlaces }: Props) {
+export default function TripDetailClient({ trip, initialPlaces, isPublicView }: Props) {
+  const router = useRouter();
   const [places, setPlaces] = useState<Place[]>(initialPlaces);
   // 0 = 전체 보기, 1+ = 특정 일자
   const [selectedDay, setSelectedDay] = useState(1);
@@ -100,8 +105,20 @@ export default function TripDetailClient({ trip, initialPlaces }: Props) {
   const [selectedPlace, setSelectedPlace] = useState<Place | null>(null);
   const [travelMode, setTravelMode] = useState<TravelMode>("DRIVING");
   const [mapLayer, setMapLayer] = useState<MapLayerType>("roadmap");
+  const [isCopying, setIsCopying] = useState(false);
   const [, startTransition] = useTransition();
   const reorderTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  async function handleCopyTrip() {
+    setIsCopying(true);
+    const result = await copyTrip(trip.id);
+    setIsCopying(false);
+    if (result.error) {
+      alert(result.error);
+    } else if (result.newTripId) {
+      router.push(`/trips/${result.newTripId}`);
+    }
+  }
 
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? "",
@@ -238,13 +255,23 @@ export default function TripDetailClient({ trip, initialPlaces }: Props) {
       <div className="w-[380px] flex-shrink-0 flex flex-col border-r border-gray-100 bg-white overflow-hidden">
         {/* 헤더 */}
         <div className="px-5 pt-5 pb-4 border-b border-gray-100">
-          <Link
-            href="/trips"
-            className="inline-flex items-center gap-1.5 text-gray-400 hover:text-black text-sm mb-3 transition-colors"
-          >
-            <ArrowLeft className="w-3.5 h-3.5" />
-            내 여행
-          </Link>
+          {isPublicView ? (
+            <Link
+              href="/best-maps"
+              className="inline-flex items-center gap-1.5 text-gray-400 hover:text-black text-sm mb-3 transition-colors"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" />
+              최고의 지도
+            </Link>
+          ) : (
+            <Link
+              href="/trips"
+              className="inline-flex items-center gap-1.5 text-gray-400 hover:text-black text-sm mb-3 transition-colors"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" />
+              내 여행
+            </Link>
+          )}
           <h1 className="text-lg font-bold text-black leading-tight">
             {trip.title}
           </h1>
@@ -257,6 +284,16 @@ export default function TripDetailClient({ trip, initialPlaces }: Props) {
             <p className="text-gray-300 text-xs mt-2">
               {trip.start_date ?? "?"} ~ {trip.end_date ?? "?"}
             </p>
+          )}
+          {isPublicView && (
+            <button
+              onClick={handleCopyTrip}
+              disabled={isCopying}
+              className="mt-3 w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-black hover:bg-gray-800 text-white text-sm font-medium transition-colors disabled:opacity-50"
+            >
+              <Copy className="w-4 h-4" />
+              {isCopying ? "복사 중..." : "내 여행으로 가져가기"}
+            </button>
           )}
         </div>
 
@@ -331,7 +368,7 @@ export default function TripDetailClient({ trip, initialPlaces }: Props) {
                             key={place.id}
                             place={place}
                             index={i + 1}
-                            onRemove={() => handleRemovePlace(place.id)}
+                            onRemove={isPublicView ? undefined : () => handleRemovePlace(place.id)}
                             onClick={() => setSelectedPlace(place)}
                           />
                         ))}
@@ -351,6 +388,17 @@ export default function TripDetailClient({ trip, initialPlaces }: Props) {
               <p className="text-gray-300 text-xs mt-1">
                 아래 버튼으로 장소를 추가해보세요
               </p>
+            </div>
+          ) : isPublicView ? (
+            <div className="flex flex-col gap-2">
+              {dayPlaces.map((place, index) => (
+                <PlaceCard
+                  key={place.id}
+                  place={place}
+                  index={index + 1}
+                  onClick={() => setSelectedPlace(place)}
+                />
+              ))}
             </div>
           ) : (
             <Reorder.Group
@@ -372,8 +420,8 @@ export default function TripDetailClient({ trip, initialPlaces }: Props) {
           )}
         </div>
 
-        {/* 장소 추가 버튼 (전체 보기 시 숨김) */}
-        {selectedDay !== 0 && (
+        {/* 장소 추가 버튼 (전체 보기·공개 뷰 시 숨김) */}
+        {selectedDay !== 0 && !isPublicView && (
           <div className="px-3 py-3 border-t border-gray-100">
             <button
               onClick={() => setIsAddingPlace(true)}
@@ -396,8 +444,8 @@ export default function TripDetailClient({ trip, initialPlaces }: Props) {
           isLoaded={isLoaded}
           travelMode={travelMode}
           mapLayer={mapLayer}
-          isEditable={selectedDay > 0}
-          onDblClickPlace={handleDblClickPlace}
+          isEditable={selectedDay > 0 && !isPublicView}
+          onDblClickPlace={isPublicView ? undefined : handleDblClickPlace}
         />
 
         {/* 이동 수단 선택 (상단 중앙) */}
@@ -439,28 +487,32 @@ export default function TripDetailClient({ trip, initialPlaces }: Props) {
         </div>
 
         {/* 더블클릭 장소 추가 확인 팝업 */}
-        <AnimatePresence>
-          {dblClickPlace && (
-            <MapClickConfirm
-              name={dblClickPlace.name}
-              address={dblClickPlace.address}
-              onConfirm={handleConfirmDblClick}
-              onCancel={() => setDblClickPlace(null)}
-            />
-          )}
-        </AnimatePresence>
+        {!isPublicView && (
+          <AnimatePresence>
+            {dblClickPlace && (
+              <MapClickConfirm
+                name={dblClickPlace.name}
+                address={dblClickPlace.address}
+                onConfirm={handleConfirmDblClick}
+                onCancel={() => setDblClickPlace(null)}
+              />
+            )}
+          </AnimatePresence>
+        )}
 
         {/* 장소 추가 모달 */}
-        <AnimatePresence>
-          {isAddingPlace && isLoaded && (
-            <PlaceSearch
-              day={selectedDay}
-              existingCount={dayPlaces.length}
-              onAdd={handleAddPlace}
-              onClose={() => setIsAddingPlace(false)}
-            />
-          )}
-        </AnimatePresence>
+        {!isPublicView && (
+          <AnimatePresence>
+            {isAddingPlace && isLoaded && (
+              <PlaceSearch
+                day={selectedDay}
+                existingCount={dayPlaces.length}
+                onAdd={handleAddPlace}
+                onClose={() => setIsAddingPlace(false)}
+              />
+            )}
+          </AnimatePresence>
+        )}
       </div>
 
       {/* 장소 상세 패널 */}
@@ -471,6 +523,8 @@ export default function TripDetailClient({ trip, initialPlaces }: Props) {
             place={selectedPlace}
             onClose={() => setSelectedPlace(null)}
             onUpdate={handleUpdatePlace}
+            readOnly={isPublicView}
+            isLoaded={isLoaded}
           />
         )}
       </AnimatePresence>

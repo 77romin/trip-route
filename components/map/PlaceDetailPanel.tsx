@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
   X,
@@ -14,6 +14,11 @@ import {
   UtensilsCrossed,
   Circle,
   Check,
+  Star,
+  Phone,
+  Globe,
+  ExternalLink,
+  ImageOff,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Place, PlaceCategory } from "@/types";
@@ -28,16 +33,29 @@ const CATEGORY_OPTIONS: { value: PlaceCategory; icon: React.ElementType; label: 
   { value: "other", icon: Circle, label: "기타" },
 ];
 
+interface GooglePlaceDetails {
+  photos: string[];
+  rating?: number;
+  userRatingsTotal?: number;
+  phone?: string;
+  website?: string;
+  mapsUrl?: string;
+}
+
 interface PlaceDetailPanelProps {
   place: Place;
   onClose: () => void;
   onUpdate: (placeId: string, data: { notes?: string; duration_minutes?: number | null; category?: PlaceCategory }) => void;
+  readOnly?: boolean;
+  isLoaded?: boolean;
 }
 
 export default function PlaceDetailPanel({
   place,
   onClose,
   onUpdate,
+  readOnly,
+  isLoaded,
 }: PlaceDetailPanelProps) {
   const [notes, setNotes] = useState(place.notes ?? "");
   const [duration, setDuration] = useState(
@@ -46,6 +64,45 @@ export default function PlaceDetailPanel({
   const [category, setCategory] = useState<PlaceCategory>(place.category ?? "other");
   const [isPending, startTransition] = useTransition();
   const [saved, setSaved] = useState(false);
+  const [googleDetails, setGoogleDetails] = useState<GooglePlaceDetails | null>(null);
+
+  // Google Places API로 상세정보 조회
+  useEffect(() => {
+    if (!isLoaded || !place.google_place_id) return;
+    if (typeof window === "undefined" || !window.google?.maps?.places) return;
+
+    const div = document.createElement("div");
+    const service = new window.google.maps.places.PlacesService(div);
+
+    service.getDetails(
+      {
+        placeId: place.google_place_id,
+        fields: [
+          "photos",
+          "rating",
+          "user_ratings_total",
+          "formatted_phone_number",
+          "website",
+          "url",
+        ],
+      },
+      (result, status) => {
+        if (status === window.google.maps.places.PlacesServiceStatus.OK && result) {
+          const photos = (result.photos ?? [])
+            .slice(0, 3)
+            .map((p) => p.getUrl({ maxWidth: 400, maxHeight: 300 }));
+          setGoogleDetails({
+            photos,
+            rating: result.rating,
+            userRatingsTotal: result.user_ratings_total,
+            phone: result.formatted_phone_number,
+            website: result.website,
+            mapsUrl: result.url,
+          });
+        }
+      }
+    );
+  }, [isLoaded, place.google_place_id]);
 
   function handleSave() {
     const durationVal = duration ? parseInt(duration, 10) : null;
@@ -101,6 +158,78 @@ export default function PlaceDetailPanel({
 
       {/* 편집 영역 */}
       <div className="flex-1 overflow-y-auto px-5 py-5 space-y-5">
+
+        {/* Google Places 사진 */}
+        {googleDetails && googleDetails.photos.length > 0 && (
+          <div>
+            <div className="flex gap-2 overflow-x-auto pb-1">
+              {googleDetails.photos.map((url, i) => (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  key={i}
+                  src={url}
+                  alt={place.name}
+                  className="h-28 w-auto flex-shrink-0 rounded-xl object-cover"
+                />
+              ))}
+            </div>
+          </div>
+        )}
+        {googleDetails && googleDetails.photos.length === 0 && (
+          <div className="h-28 rounded-xl bg-gray-100 flex items-center justify-center">
+            <ImageOff className="w-6 h-6 text-gray-300" />
+          </div>
+        )}
+
+        {/* Google Places 정보 */}
+        {googleDetails && (
+          <div className="space-y-2 rounded-xl border border-gray-100 p-3 bg-gray-50">
+            {googleDetails.rating && (
+              <div className="flex items-center gap-2">
+                <Star className="w-3.5 h-3.5 text-yellow-400 fill-yellow-400 flex-shrink-0" />
+                <span className="text-sm font-medium text-black">
+                  {googleDetails.rating.toFixed(1)}
+                </span>
+                {googleDetails.userRatingsTotal && (
+                  <span className="text-xs text-gray-400">
+                    ({googleDetails.userRatingsTotal.toLocaleString()}개 리뷰)
+                  </span>
+                )}
+              </div>
+            )}
+            {googleDetails.phone && (
+              <div className="flex items-center gap-2">
+                <Phone className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
+                <span className="text-sm text-gray-700">{googleDetails.phone}</span>
+              </div>
+            )}
+            {googleDetails.website && (
+              <div className="flex items-center gap-2 min-w-0">
+                <Globe className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
+                <a
+                  href={googleDetails.website}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm text-blue-500 hover:underline truncate"
+                >
+                  {googleDetails.website.replace(/^https?:\/\//, "").split("/")[0]}
+                </a>
+              </div>
+            )}
+            {googleDetails.mapsUrl && (
+              <a
+                href={googleDetails.mapsUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-black transition-colors"
+              >
+                <ExternalLink className="w-3 h-3" />
+                Google Maps에서 보기
+              </a>
+            )}
+          </div>
+        )}
+
         {/* 카테고리 */}
         <div>
           <label className="flex items-center gap-1.5 text-sm font-medium text-gray-600 mb-2">
@@ -111,12 +240,15 @@ export default function PlaceDetailPanel({
             {CATEGORY_OPTIONS.map(({ value, icon: Icon, label }) => (
               <button
                 key={value}
-                onClick={() => setCategory(value)}
+                onClick={() => !readOnly && setCategory(value)}
+                disabled={readOnly}
                 className={cn(
                   "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-all",
                   category === value
                     ? "bg-black text-white border-black"
-                    : "border-gray-200 text-gray-500 hover:border-gray-400 hover:text-black"
+                    : "border-gray-200 text-gray-500",
+                  !readOnly && category !== value && "hover:border-gray-400 hover:text-black",
+                  readOnly && "cursor-default"
                 )}
               >
                 <Icon className="w-3 h-3" />
@@ -135,10 +267,15 @@ export default function PlaceDetailPanel({
           <input
             type="number"
             value={duration}
-            onChange={(e) => setDuration(e.target.value)}
-            placeholder="예: 60"
+            onChange={(e) => !readOnly && setDuration(e.target.value)}
+            readOnly={readOnly}
+            placeholder={readOnly && !duration ? "미설정" : "예: 60"}
             min={0}
-            className="w-full h-10 rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm text-black placeholder:text-gray-400 focus:outline-none focus:border-black focus:bg-white transition-all"
+            className={cn(
+              "w-full h-10 rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm text-black placeholder:text-gray-400 focus:outline-none transition-all",
+              !readOnly && "focus:border-black focus:bg-white",
+              readOnly && "cursor-default"
+            )}
           />
         </div>
 
@@ -150,38 +287,45 @@ export default function PlaceDetailPanel({
           </label>
           <textarea
             value={notes}
-            onChange={(e) => setNotes(e.target.value)}
-            placeholder="이 장소에 대한 메모를 남겨보세요..."
+            onChange={(e) => !readOnly && setNotes(e.target.value)}
+            readOnly={readOnly}
+            placeholder={readOnly && !notes ? "메모 없음" : "이 장소에 대한 메모를 남겨보세요..."}
             rows={5}
-            className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-black placeholder:text-gray-400 focus:outline-none focus:border-black focus:bg-white transition-all resize-none"
+            className={cn(
+              "w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-black placeholder:text-gray-400 focus:outline-none transition-all resize-none",
+              !readOnly && "focus:border-black focus:bg-white",
+              readOnly && "cursor-default"
+            )}
           />
         </div>
       </div>
 
-      {/* 저장 버튼 */}
-      <div className="px-5 py-4 border-t border-gray-100">
-        <button
-          onClick={handleSave}
-          disabled={isPending}
-          className={cn(
-            "w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium transition-all",
-            saved
-              ? "bg-green-500 text-white"
-              : "bg-black hover:bg-gray-800 text-white disabled:opacity-50"
-          )}
-        >
-          {saved ? (
-            <>
-              <Check className="w-4 h-4" />
-              저장됨
-            </>
-          ) : isPending ? (
-            "저장 중..."
-          ) : (
-            "저장"
-          )}
-        </button>
-      </div>
+      {/* 저장 버튼 (readOnly면 숨김) */}
+      {!readOnly && (
+        <div className="px-5 py-4 border-t border-gray-100">
+          <button
+            onClick={handleSave}
+            disabled={isPending}
+            className={cn(
+              "w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium transition-all",
+              saved
+                ? "bg-green-500 text-white"
+                : "bg-black hover:bg-gray-800 text-white disabled:opacity-50"
+            )}
+          >
+            {saved ? (
+              <>
+                <Check className="w-4 h-4" />
+                저장됨
+              </>
+            ) : isPending ? (
+              "저장 중..."
+            ) : (
+              "저장"
+            )}
+          </button>
+        </div>
+      )}
     </motion.div>
   );
 }

@@ -78,8 +78,8 @@ function TripCard({
       transition={{ duration: 0.35, delay: Math.min((rank - 1) * 0.04, 0.4) }}
       className="bg-white rounded-2xl border border-gray-100 hover:border-gray-200 hover:shadow-md hover:shadow-black/5 transition-all flex flex-col overflow-hidden group"
     >
-      {/* 썸네일 + 내용 (클릭 시 여행 상세로 이동) */}
-      <Link href={`/trips/${trip.id}`} className="flex flex-col flex-1">
+      {/* 썸네일 + 내용 (클릭 시 공개 여행 상세로 이동) */}
+      <Link href={`/best-maps/${trip.id}`} className="flex flex-col flex-1">
         <div className="h-36 bg-gray-100 flex items-center justify-center relative flex-shrink-0">
           <MapPin className="w-8 h-8 text-gray-200" />
           {trip.region && (

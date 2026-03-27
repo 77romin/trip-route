@@ -7,17 +7,37 @@ export const metadata: Metadata = {
   title: "내 여행 — TripRoute",
 };
 
+const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? "";
+
+function buildStaticMapUrl(places: { lat: number; lng: number }[]): string | null {
+  if (!places.length || !API_KEY) return null;
+
+  const sorted = places.slice(0, 20);
+  const markerParams = sorted
+    .map((p) => `markers=size:small%7Ccolor:0x000000%7C${p.lat},${p.lng}`)
+    .join("&");
+  const pathCoords = sorted.map((p) => `${p.lat},${p.lng}`).join("|");
+  const pathParam =
+    sorted.length > 1
+      ? `&path=color:0x000000ff%7Cweight:3%7C${encodeURIComponent(pathCoords)}`
+      : "";
+
+  return `https://maps.googleapis.com/maps/api/staticmap?size=400x200&scale=2&maptype=roadmap&${markerParams}${pathParam}&key=${API_KEY}`;
+}
+
 export default async function TripsPage() {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const { data: trips } = await supabase
+  const { data: tripsRaw } = await supabase
     .from("trips")
-    .select("*")
+    .select("*, places(lat, lng, day, order)")
     .eq("user_id", user?.id ?? "")
     .order("created_at", { ascending: false });
+
+  const trips = tripsRaw ?? [];
 
   return (
     <div className="p-8">
@@ -26,7 +46,7 @@ export default async function TripsPage() {
         <div>
           <h1 className="text-2xl font-bold text-black mb-1">내 여행</h1>
           <p className="text-gray-400 text-sm">
-            {trips?.length ?? 0}개의 여행 계획
+            {trips.length}개의 여행 계획
           </p>
         </div>
         <Link
@@ -39,20 +59,31 @@ export default async function TripsPage() {
       </div>
 
       {/* 여행 목록 */}
-      {!trips || trips.length === 0 ? (
+      {trips.length === 0 ? (
         <EmptyState isGuest={!user} />
       ) : (
         <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-5">
-          {trips.map((trip) => (
-            <TripCard key={trip.id} trip={trip} />
-          ))}
+          {trips.map((trip) => {
+            const places = ((trip.places ?? []) as { lat: number; lng: number; day: number; order: number }[])
+              .sort((a, b) => a.day - b.day || a.order - b.order);
+            const mapUrl = buildStaticMapUrl(places);
+            return (
+              <TripCard key={trip.id as string} trip={trip} mapUrl={mapUrl} />
+            );
+          })}
         </div>
       )}
     </div>
   );
 }
 
-function TripCard({ trip }: { trip: Record<string, unknown> }) {
+function TripCard({
+  trip,
+  mapUrl,
+}: {
+  trip: Record<string, unknown>;
+  mapUrl: string | null;
+}) {
   const title = trip.title as string;
   const description = trip.description as string | undefined;
   const startDate = trip.start_date as string | undefined;
@@ -62,9 +93,18 @@ function TripCard({ trip }: { trip: Record<string, unknown> }) {
   return (
     <Link href={`/trips/${id}`}>
       <div className="bg-white rounded-2xl p-6 border border-gray-100 hover:border-gray-200 hover:shadow-md hover:shadow-black/5 cursor-pointer group transition-all">
-        {/* 커버 이미지 placeholder */}
-        <div className="w-full h-32 rounded-xl bg-gray-100 border border-gray-100 mb-5 flex items-center justify-center">
-          <MapPin className="w-8 h-8 text-gray-300" />
+        {/* 커버 이미지 */}
+        <div className="w-full h-32 rounded-xl bg-gray-100 border border-gray-100 mb-5 overflow-hidden flex items-center justify-center">
+          {mapUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={mapUrl}
+              alt={title}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <MapPin className="w-8 h-8 text-gray-300" />
+          )}
         </div>
 
         <h3 className="text-black font-semibold text-base mb-1.5 group-hover:text-gray-700 transition-colors">

@@ -32,7 +32,7 @@ const CATEGORY_CONFIG: Record<
 interface PlaceCardProps {
   place: Place;
   index: number;
-  onRemove: () => void;
+  onRemove?: () => void;
   onClick?: () => void;
   dragControls?: DragControls;
   readOnly?: boolean;
@@ -96,7 +96,7 @@ export default function PlaceCard({
           </div>
 
           {/* 삭제 버튼 */}
-          {!readOnly && (
+          {!readOnly && onRemove && (
             <button
               onClick={onRemove}
               className="opacity-0 group-hover:opacity-100 transition-opacity w-6 h-6 rounded-lg hover:bg-red-50 flex items-center justify-center flex-shrink-0"
