@@ -68,41 +68,67 @@ export default function PlaceDetailPanel({
 
   // Google Places API로 상세정보 조회
   useEffect(() => {
-    if (!isLoaded || !place.google_place_id) return;
+    if (!isLoaded) return;
     if (typeof window === "undefined" || !window.google?.maps?.places) return;
 
     const div = document.createElement("div");
     const service = new window.google.maps.places.PlacesService(div);
+    const FIELDS = [
+      "photos",
+      "rating",
+      "user_ratings_total",
+      "formatted_phone_number",
+      "website",
+      "url",
+    ];
 
-    service.getDetails(
-      {
-        placeId: place.google_place_id,
-        fields: [
-          "photos",
-          "rating",
-          "user_ratings_total",
-          "formatted_phone_number",
-          "website",
-          "url",
-        ],
-      },
-      (result, status) => {
+    function applyResult(result: google.maps.places.PlaceResult) {
+      const photos = (result.photos ?? [])
+        .slice(0, 3)
+        .map((p) => p.getUrl({ maxWidth: 400, maxHeight: 300 }));
+      setGoogleDetails({
+        photos,
+        rating: result.rating,
+        userRatingsTotal: result.user_ratings_total,
+        phone: result.formatted_phone_number,
+        website: result.website,
+        mapsUrl: result.url,
+      });
+    }
+
+    if (place.google_place_id) {
+      // place_id로 직접 조회
+      service.getDetails({ placeId: place.google_place_id, fields: FIELDS }, (result, status) => {
         if (status === window.google.maps.places.PlacesServiceStatus.OK && result) {
-          const photos = (result.photos ?? [])
-            .slice(0, 3)
-            .map((p) => p.getUrl({ maxWidth: 400, maxHeight: 300 }));
-          setGoogleDetails({
-            photos,
-            rating: result.rating,
-            userRatingsTotal: result.user_ratings_total,
-            phone: result.formatted_phone_number,
-            website: result.website,
-            mapsUrl: result.url,
-          });
+          applyResult(result);
         }
-      }
-    );
-  }, [isLoaded, place.google_place_id]);
+      });
+    } else {
+      // place_id 없으면 이름+주소로 검색 후 조회
+      const query = place.address ? `${place.name} ${place.address}` : place.name;
+      service.findPlaceFromQuery(
+        { query, fields: ["place_id"] },
+        (results, status) => {
+          if (
+            status === window.google.maps.places.PlacesServiceStatus.OK &&
+            results?.[0]?.place_id
+          ) {
+            service.getDetails(
+              { placeId: results[0].place_id!, fields: FIELDS },
+              (detail, detailStatus) => {
+                if (
+                  detailStatus === window.google.maps.places.PlacesServiceStatus.OK &&
+                  detail
+                ) {
+                  applyResult(detail);
+                }
+              }
+            );
+          }
+        }
+      );
+    }
+  }, [isLoaded, place.google_place_id, place.name, place.address]);
 
   function handleSave() {
     const durationVal = duration ? parseInt(duration, 10) : null;

@@ -12,6 +12,13 @@ export type ProfileSnippet = {
   avatar_url: string | null;
 };
 
+export type TripPlaceSnippet = {
+  lat: number;
+  lng: number;
+  day: number;
+  order: number;
+};
+
 export type PublicTrip = {
   id: string;
   title: string;
@@ -23,6 +30,7 @@ export type PublicTrip = {
   end_date: string | null;
   user_id: string;
   profiles: ProfileSnippet | ProfileSnippet[];
+  places?: TripPlaceSnippet[];
 };
 
 export default async function BestMapsPage() {
@@ -32,7 +40,7 @@ export default async function BestMapsPage() {
     supabase
       .from("trips")
       .select(
-        "id, title, description, region, copy_count, like_count, start_date, end_date, user_id, profiles(full_name, avatar_url)"
+        "id, title, description, region, copy_count, like_count, start_date, end_date, user_id, profiles(full_name, avatar_url), places(lat, lng, day, order)"
       )
       .eq("is_public", true)
       .order("copy_count", { ascending: false })

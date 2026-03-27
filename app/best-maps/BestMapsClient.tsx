@@ -6,7 +6,25 @@ import { Search, Heart, Copy, MapPin, Calendar, User, X, Frown } from "lucide-re
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import type { PublicTrip, ProfileSnippet } from "./page";
+import type { PublicTrip, ProfileSnippet, TripPlaceSnippet } from "./page";
+
+const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? "";
+
+function buildStaticMapUrl(places: TripPlaceSnippet[]): string | null {
+  if (!places.length || !API_KEY) return null;
+  const sorted = places
+    .sort((a, b) => a.day - b.day || a.order - b.order)
+    .slice(0, 20);
+  const markerParams = sorted
+    .map((p) => `markers=size:small%7Ccolor:0x000000%7C${p.lat},${p.lng}`)
+    .join("&");
+  const pathCoords = sorted.map((p) => `${p.lat},${p.lng}`).join("|");
+  const pathParam =
+    sorted.length > 1
+      ? `&path=color:0x000000ff%7Cweight:3%7C${encodeURIComponent(pathCoords)}`
+      : "";
+  return `https://maps.googleapis.com/maps/api/staticmap?size=400x200&scale=2&maptype=roadmap&${markerParams}${pathParam}&key=${API_KEY}`;
+}
 import { copyTrip, toggleLike } from "./actions";
 
 // ── 지역 계층 구조 ─────────────────────────────────────────────
@@ -53,6 +71,7 @@ interface TripCardProps {
   isLiked: boolean;
   likeCount: number;
   isCopying: boolean;
+  mapUrl: string | null;
   onCopy: () => void;
   onLike: () => void;
 }
@@ -63,6 +82,7 @@ function TripCard({
   isLiked,
   likeCount,
   isCopying,
+  mapUrl,
   onCopy,
   onLike,
 }: TripCardProps) {
@@ -80,8 +100,13 @@ function TripCard({
     >
       {/* 썸네일 + 내용 (클릭 시 공개 여행 상세로 이동) */}
       <Link href={`/best-maps/${trip.id}`} className="flex flex-col flex-1">
-        <div className="h-36 bg-gray-100 flex items-center justify-center relative flex-shrink-0">
-          <MapPin className="w-8 h-8 text-gray-200" />
+        <div className="h-36 bg-gray-100 flex items-center justify-center relative flex-shrink-0 overflow-hidden">
+          {mapUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={mapUrl} alt={trip.title} className="w-full h-full object-cover" />
+          ) : (
+            <MapPin className="w-8 h-8 text-gray-200" />
+          )}
           {trip.region && (
             <span className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-black/80 backdrop-blur-sm text-white text-xs font-medium">
               {trip.region}
@@ -456,6 +481,7 @@ export default function BestMapsClient({
                 isLiked={likedIds.has(trip.id)}
                 likeCount={likeCounts[trip.id] ?? trip.like_count}
                 isCopying={copyingId === trip.id}
+                mapUrl={buildStaticMapUrl(trip.places ?? [])}
                 onCopy={() => handleCopy(trip.id)}
                 onLike={() => handleLike(trip.id)}
               />
