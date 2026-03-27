@@ -12,28 +12,39 @@ import type { Place, PlaceCategory } from "@/types";
 import type { MapPlaceInfo } from "./MapPlacePanel";
 
 // 카테고리별 Google Maps 스타일 규칙
+// elementType 미지정 = geometry + labels 모두 적용 (일부 POI가 labels만으로 숨겨지지 않음)
 function getCategoryFilterStyles(category: PlaceCategory | null): google.maps.MapTypeStyle[] {
   if (!category) return [];
 
-  // 모든 POI 숨기기
+  // 모든 POI + 하위 타입 명시적으로 숨기기
   const hideAll: google.maps.MapTypeStyle[] = [
-    { featureType: "poi" as string, elementType: "labels", stylers: [{ visibility: "off" }] },
+    { featureType: "poi", stylers: [{ visibility: "off" }] },
+    { featureType: "poi.attraction", stylers: [{ visibility: "off" }] },
+    { featureType: "poi.business", stylers: [{ visibility: "off" }] },
+    { featureType: "poi.food_and_drink", stylers: [{ visibility: "off" }] },
+    { featureType: "poi.government", stylers: [{ visibility: "off" }] },
+    { featureType: "poi.medical", stylers: [{ visibility: "off" }] },
+    { featureType: "poi.park", stylers: [{ visibility: "off" }] },
+    { featureType: "poi.place_of_worship", stylers: [{ visibility: "off" }] },
+    { featureType: "poi.school", stylers: [{ visibility: "off" }] },
+    { featureType: "poi.sports_complex", stylers: [{ visibility: "off" }] },
   ];
 
   switch (category) {
     case "restaurant":
     case "cafe":
-      return [...hideAll, { featureType: "poi.food_and_drink" as string, elementType: "labels", stylers: [{ visibility: "on" }] }];
+      return [...hideAll, { featureType: "poi.food_and_drink", stylers: [{ visibility: "on" }] }];
     case "attraction":
-      return [...hideAll, { featureType: "poi.attraction" as string, elementType: "labels", stylers: [{ visibility: "on" }] }];
+      return [...hideAll, { featureType: "poi.attraction", stylers: [{ visibility: "on" }] }];
     case "hotel":
+      return [...hideAll, { featureType: "poi.business", stylers: [{ visibility: "on" }] }];
     case "shopping":
-      return [...hideAll, { featureType: "poi.business" as string, elementType: "labels", stylers: [{ visibility: "on" }] }];
+      return [...hideAll, { featureType: "poi.business", stylers: [{ visibility: "on" }] }];
     case "transport":
       return [
         ...hideAll,
-        { featureType: "transit" as string, elementType: "labels", stylers: [{ visibility: "off" }] },
-        { featureType: "transit.station" as string, elementType: "labels", stylers: [{ visibility: "on" }] },
+        { featureType: "transit", stylers: [{ visibility: "off" }] },
+        { featureType: "transit.station", stylers: [{ visibility: "on" }] },
       ];
     default:
       return [];
