@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo, Fragment } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { GoogleMap, Marker, Polyline, DirectionsRenderer } from "@react-google-maps/api";
+import { GoogleMap, Marker, Polyline, DirectionsRenderer, OverlayView } from "@react-google-maps/api";
 import {
   GOOGLE_MAPS_DEFAULT_CENTER,
   GOOGLE_MAPS_DEFAULT_ZOOM,
@@ -10,6 +10,24 @@ import {
 } from "@/lib/google-maps/config";
 import type { Place, PlaceCategory } from "@/types";
 import type { MapPlaceInfo } from "./MapPlacePanel";
+
+// 초 → "X분" / "X시간" / "X시간 X분" 포맷
+function formatDuration(seconds: number): string {
+  const minutes = Math.round(seconds / 60);
+  if (minutes < 60) return `${minutes}분`;
+  const hours = Math.floor(minutes / 60);
+  const mins = minutes % 60;
+  if (mins === 0) return `${hours}시간`;
+  return `${hours}시간 ${mins}분`;
+}
+
+// 두 좌표의 중간점
+function midpoint(
+  p1: { lat: number; lng: number },
+  p2: { lat: number; lng: number }
+) {
+  return { lat: (p1.lat + p2.lat) / 2, lng: (p1.lng + p2.lng) / 2 };
+}
 
 // 카테고리별 Google Maps 스타일 규칙
 // elementType: "labels" 만 조작 → geometry(공원 초록색, 건물 배경 등)는 유지하면서 아이콘·텍스트만 필터링
@@ -595,8 +613,60 @@ export default function TripMap({
                     }}
                   />
                 )}
+
+                {/* ── 활성 일자 구간별 소요 시간 레이블 ────────── */}
+                {travelMode !== "STRAIGHT" &&
+                  segmentDirections.map((dir, i) => {
+                    if (!dir || i >= places.length - 1) return null;
+                    const secs = dir.routes[0]?.legs[0]?.duration?.value;
+                    if (!secs) return null;
+                    const mid = midpoint(places[i], places[i + 1]);
+                    return (
+                      <OverlayView
+                        key={`dur-${i}`}
+                        position={mid}
+                        mapPaneName="floatPane"
+                      >
+                        <div
+                          style={{ transform: "translate(-50%, -50%)" }}
+                          className="bg-white rounded-full px-2.5 py-1 text-[11px] font-semibold shadow-md text-gray-600 whitespace-nowrap border border-gray-100 pointer-events-none"
+                        >
+                          {formatDuration(secs)}
+                        </div>
+                      </OverlayView>
+                    );
+                  })}
               </>
             )}
+
+            {/* ── 전체 보기 구간별 소요 시간 레이블 ──────────────── */}
+            {selectedDay === 0 && travelMode !== "STRAIGHT" &&
+              Object.keys(multiDayDirections).flatMap((dayKey) => {
+                const day = Number(dayKey);
+                const dp = placesByDay[day];
+                const dirs = multiDayDirections[day];
+                if (!dp || !dirs) return [];
+                return dirs.map((dir, i) => {
+                  if (!dir || i >= dp.length - 1) return null;
+                  const secs = dir.routes[0]?.legs[0]?.duration?.value;
+                  if (!secs) return null;
+                  const mid = midpoint(dp[i], dp[i + 1]);
+                  return (
+                    <OverlayView
+                      key={`dur-${day}-${i}`}
+                      position={mid}
+                      mapPaneName="floatPane"
+                    >
+                      <div
+                        style={{ transform: "translate(-50%, -50%)" }}
+                        className="bg-white rounded-full px-2.5 py-1 text-[11px] font-semibold shadow-md text-gray-600 whitespace-nowrap border border-gray-100 pointer-events-none"
+                      >
+                        {formatDuration(secs)}
+                      </div>
+                    </OverlayView>
+                  );
+                });
+              })}
           </>
         ) : (
           // ── 단일 모드 (하위 호환) ──────────────────────────────────
