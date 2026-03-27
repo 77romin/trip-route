@@ -42,16 +42,15 @@ async function callAI(provider: AiProvider, apiKey: string, prompt: string): Pro
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
           contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { maxOutputTokens: 8192 },
+          generationConfig: { maxOutputTokens: 16384 },
         }),
       }
     );
     const data = await res.json();
     if (!res.ok) throw new Error(data.error?.message ?? "Gemini API 오류");
-    // gemini-2.5-flash는 thinking 기능으로 parts가 여러 개 — thought=true가 아닌 마지막 텍스트 사용
-    const parts = data.candidates[0].content.parts as { text?: string; thought?: boolean }[];
-    const responsePart = parts.filter((p) => !p.thought && p.text).pop() ?? parts[parts.length - 1];
-    return responsePart?.text ?? "";
+    // 모든 텍스트 파트 합치기 (thinking 포함 — JSON 추출 정규식이 알아서 찾음)
+    const parts = data.candidates[0].content.parts as { text?: string }[];
+    return parts.map((p) => p.text ?? "").join("\n");
   }
 
   if (provider === "chatgpt") {
@@ -163,7 +162,8 @@ export async function generateTripWithAI(input: {
   try {
     parsed = JSON.parse(jsonMatch[1]);
   } catch {
-    return { error: "AI 응답 형식이 올바르지 않아요." };
+    const preview = jsonMatch[1].slice(0, 120).replace(/\n/g, " ");
+    return { error: `AI 응답 형식이 올바르지 않아요. (내용: ${preview})` };
   }
   if (!parsed.places?.length) return { error: "생성된 장소가 없어요." };
 
