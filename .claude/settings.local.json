@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls /Users/mink/Developer_mink/claude_project/triproute/app/'\\(dashboard\\)'/map/)",
+      "Bash(ls:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npx eslint:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(pbcopy)",
+      "Bash(npx next:*)",
+      "WebSearch",
+      "Bash(vercel --version)",
+      "Bash(npm run:*)",
+      "Bash(vercel:*)"
+    ]
+  },
+  "prefersReducedMotion": false
+}
