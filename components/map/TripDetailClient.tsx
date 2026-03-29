@@ -139,7 +139,7 @@ export default function TripDetailClient({ trip, initialPlaces, isPublicView }: 
   const [isCopying, setIsCopying] = useState(false);
   const [categoryFilter, setCategoryFilter] = useState<PlaceCategory | null>(null);
   const [mapClickPlace, setMapClickPlace] = useState<MapPlaceInfo | null>(null);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isPublic, setIsPublic] = useState(trip.is_public);
   const [isTogglingPublic, setIsTogglingPublic] = useState(false);
 

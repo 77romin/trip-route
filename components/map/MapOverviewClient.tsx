@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useJsApiLoader } from "@react-google-maps/api";
-import { Map, MapPin, ArrowRight, CalendarDays, Car, Train, Bike, PersonStanding, Minus } from "lucide-react";
+import { motion } from "framer-motion";
+import { Map, MapPin, ArrowRight, CalendarDays, Car, Train, Bike, PersonStanding, Minus, ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { GOOGLE_MAPS_LIBRARIES } from "@/lib/google-maps/config";
@@ -33,6 +34,11 @@ export default function MapOverviewClient({ trips, places }: Props) {
     trips[0]?.id ?? null
   );
   const [travelMode, setTravelMode] = useState<TravelMode>("DRIVING");
+  const [panelOpen, setPanelOpen] = useState(false);
+
+  useEffect(() => {
+    setPanelOpen(window.innerWidth >= 768);
+  }, []);
 
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? "",
@@ -57,9 +63,13 @@ export default function MapOverviewClient({ trips, places }: Props) {
   );
 
   return (
-    <div className="flex h-full overflow-hidden">
+    <div className="relative flex h-full overflow-hidden">
       {/* ── 좌측: 여행 목록 ───────────────────────────────────── */}
-      <div className="w-72 flex-shrink-0 flex flex-col border-r border-gray-100 bg-white overflow-hidden">
+      <motion.div
+        animate={{ width: panelOpen ? 288 : 0 }}
+        transition={{ duration: 0.28, ease: "easeInOut" }}
+        className="flex-shrink-0 flex flex-col border-r border-gray-100 bg-white overflow-hidden"
+      >
         <div className="px-5 py-4 border-b border-gray-100">
           <h1 className="text-base font-bold text-black">한눈에 보기</h1>
           <p className="text-gray-400 text-xs mt-0.5">
@@ -134,10 +144,21 @@ export default function MapOverviewClient({ trips, places }: Props) {
             </Link>
           </div>
         )}
-      </div>
+      </motion.div>
 
       {/* ── 지도 ─────────────────────────────────────────────── */}
       <div className="flex-1 relative">
+        {/* 사이드바 토글 버튼 — 항상 표시 */}
+        <button
+          onClick={() => setPanelOpen((v) => !v)}
+          className="absolute left-0 top-1/2 -translate-y-1/2 z-20 w-6 h-16 bg-white border border-l-0 border-gray-200 rounded-r-xl flex items-center justify-center hover:bg-gray-50 transition-colors shadow-md"
+        >
+          {panelOpen ? (
+            <ChevronLeft className="w-3.5 h-3.5 text-gray-500" />
+          ) : (
+            <ChevronRight className="w-3.5 h-3.5 text-gray-500" />
+          )}
+        </button>
         {/* selectedDay=0: 전체 보기 모드 — 각 일자별 색상 직선 폴리라인 */}
         <TripMap
           places={[]}

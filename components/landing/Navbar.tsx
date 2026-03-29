@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { Map, LogOut } from "lucide-react";
+import { Map, LogOut, Menu, X } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState } from "react";
@@ -46,10 +46,18 @@ function Avatar({ user }: { user: User }) {
   );
 }
 
+const NAV_LINKS = [
+  { label: "나의 지도", href: "/trips" },
+  { label: "최고의 지도", href: "/best-maps" },
+  { label: "모두의 지도", href: "/everyone-maps" },
+  { label: "사용법", href: "/how-to-use" },
+];
+
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [authReady, setAuthReady] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -81,7 +89,7 @@ export default function Navbar() {
     <nav
       className={cn(
         "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
-        scrolled
+        scrolled || menuOpen
           ? "bg-white/90 backdrop-blur-xl border-b border-black/5 py-3"
           : "bg-transparent py-5"
       )}
@@ -97,14 +105,9 @@ export default function Navbar() {
           </span>
         </Link>
 
-        {/* 네비 링크 */}
+        {/* 데스크톱 네비 링크 */}
         <div className="hidden md:flex items-center gap-8">
-          {[
-            { label: "나의 지도", href: "/trips" },
-            { label: "최고의 지도", href: "/best-maps" },
-            { label: "모두의 지도", href: "/everyone-maps" },
-            { label: "사용법", href: "/how-to-use" },
-          ].map(({ label, href }) => (
+          {NAV_LINKS.map(({ label, href }) => (
             <Link
               key={label}
               href={href}
@@ -115,11 +118,9 @@ export default function Navbar() {
           ))}
         </div>
 
-        {/* 우측 버튼 영역 */}
-        <div className="flex items-center gap-3 min-w-[160px] justify-end">
-          {/* 인증 상태 확인 전: 레이아웃 시프트 방지용 빈 공간 */}
+        {/* 데스크톱 우측 버튼 */}
+        <div className="hidden md:flex items-center gap-3 min-w-[160px] justify-end">
           {!authReady ? null : user ? (
-            /* 로그인 후: 아바타 + 로그아웃 */
             <>
               <Link href="/trips">
                 <Avatar user={user} />
@@ -137,7 +138,6 @@ export default function Navbar() {
               </form>
             </>
           ) : (
-            /* 로그인 전: 로그인 + 시작하기 */
             <>
               <Link href="/login">
                 <Button variant="ghost" size="sm">
@@ -152,7 +152,69 @@ export default function Navbar() {
             </>
           )}
         </div>
+
+        {/* 모바일 햄버거 버튼 */}
+        <button
+          className="md:hidden flex items-center justify-center w-9 h-9 rounded-lg hover:bg-black/5 transition-colors"
+          onClick={() => setMenuOpen((v) => !v)}
+          aria-label="메뉴"
+        >
+          {menuOpen ? (
+            <X className="w-5 h-5 text-black" />
+          ) : (
+            <Menu className="w-5 h-5 text-black" />
+          )}
+        </button>
       </div>
+
+      {/* 모바일 드롭다운 메뉴 */}
+      {menuOpen && (
+        <div className="md:hidden px-6 pt-2 pb-5 flex flex-col gap-1">
+          {NAV_LINKS.map(({ label, href }) => (
+            <Link
+              key={label}
+              href={href}
+              onClick={() => setMenuOpen(false)}
+              className="py-2.5 text-gray-600 hover:text-black text-sm font-medium transition-colors border-b border-gray-100 last:border-0"
+            >
+              {label}
+            </Link>
+          ))}
+          <div className="flex items-center gap-3 pt-3">
+            {!authReady ? null : user ? (
+              <>
+                <Link href="/trips" onClick={() => setMenuOpen(false)}>
+                  <Avatar user={user} />
+                </Link>
+                <form action={signOut}>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    type="submit"
+                    className="flex items-center gap-1.5"
+                  >
+                    <LogOut className="w-3.5 h-3.5" />
+                    로그아웃
+                  </Button>
+                </form>
+              </>
+            ) : (
+              <>
+                <Link href="/login" onClick={() => setMenuOpen(false)}>
+                  <Button variant="ghost" size="sm">
+                    로그인
+                  </Button>
+                </Link>
+                <Link href="/trips" onClick={() => setMenuOpen(false)}>
+                  <Button variant="primary" size="sm">
+                    시작하기
+                  </Button>
+                </Link>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </nav>
   );
 }
