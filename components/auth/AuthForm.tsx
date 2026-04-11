@@ -71,7 +71,7 @@ export default function AuthForm({ mode }: AuthFormProps) {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 relative overflow-hidden">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex items-center justify-center px-4 relative overflow-hidden">
       <motion.div
         initial={{ opacity: 0, y: 20, scale: 0.98 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -81,20 +81,20 @@ export default function AuthForm({ mode }: AuthFormProps) {
         {/* 로고 */}
         <div className="flex justify-center mb-8">
           <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="w-9 h-9 rounded-xl bg-black flex items-center justify-center group-hover:bg-gray-800 transition-colors">
-              <Map className="w-5 h-5 text-white" />
+            <div className="w-9 h-9 rounded-xl bg-black dark:bg-white flex items-center justify-center group-hover:bg-gray-800 dark:group-hover:bg-gray-200 transition-colors">
+              <Map className="w-5 h-5 text-white dark:text-black" />
             </div>
-            <span className="text-black font-semibold text-xl tracking-tight">
+            <span className="text-black dark:text-white font-semibold text-xl tracking-tight">
               TripRoute
             </span>
           </Link>
         </div>
 
         {/* 카드 */}
-        <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm">
+        <div className="bg-white dark:bg-gray-900 rounded-2xl p-8 border border-gray-100 dark:border-gray-800 shadow-sm">
           {/* 헤더 */}
           <div className="mb-6">
-            <h1 className="text-2xl font-bold text-black mb-2">
+            <h1 className="text-2xl font-bold text-black dark:text-white mb-2">
               {isLogin ? "다시 만나서 반가워요" : "여행을 시작해볼까요"}
             </h1>
             <p className="text-gray-500 text-sm">
@@ -110,7 +110,7 @@ export default function AuthForm({ mode }: AuthFormProps) {
               type="button"
               onClick={() => handleOAuthSignIn("google")}
               disabled={socialPending !== null}
-              className="w-full h-11 flex items-center justify-center gap-2.5 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-black text-sm font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full h-11 flex items-center justify-center gap-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-black dark:text-white text-sm font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <GoogleIcon />
               {socialPending === "google" ? "연결 중..." : "Google로 계속하기"}
@@ -119,7 +119,7 @@ export default function AuthForm({ mode }: AuthFormProps) {
               type="button"
               onClick={() => handleOAuthSignIn("apple")}
               disabled={socialPending !== null}
-              className="w-full h-11 flex items-center justify-center gap-2.5 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-black text-sm font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full h-11 flex items-center justify-center gap-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-black dark:text-white text-sm font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <AppleIcon />
               {socialPending === "apple" ? "연결 중..." : "Apple로 계속하기"}
@@ -129,19 +129,19 @@ export default function AuthForm({ mode }: AuthFormProps) {
               <motion.div
                 initial={{ opacity: 0, y: -4 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="flex items-center gap-2 px-4 py-3 rounded-xl bg-red-50 border border-red-200"
+                className="flex items-center gap-2 px-4 py-3 rounded-xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800"
               >
                 <AlertCircle className="w-4 h-4 text-red-500 flex-shrink-0" />
-                <p className="text-red-600 text-sm">{socialError}</p>
+                <p className="text-red-600 dark:text-red-400 text-sm">{socialError}</p>
               </motion.div>
             )}
           </div>
 
           {/* 구분선 */}
           <div className="flex items-center gap-3 mb-6">
-            <div className="flex-1 h-px bg-gray-100" />
+            <div className="flex-1 h-px bg-gray-100 dark:bg-gray-800" />
             <span className="text-xs text-gray-400">또는 이메일로</span>
-            <div className="flex-1 h-px bg-gray-100" />
+            <div className="flex-1 h-px bg-gray-100 dark:bg-gray-800" />
           </div>
 
           {/* 이메일/비밀번호 폼 */}
@@ -182,10 +182,10 @@ export default function AuthForm({ mode }: AuthFormProps) {
               <motion.div
                 initial={{ opacity: 0, y: -4 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="flex items-center gap-2 px-4 py-3 rounded-xl bg-red-50 border border-red-200"
+                className="flex items-center gap-2 px-4 py-3 rounded-xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800"
               >
                 <AlertCircle className="w-4 h-4 text-red-500 flex-shrink-0" />
-                <p className="text-red-600 text-sm">{state.error}</p>
+                <p className="text-red-600 dark:text-red-400 text-sm">{state.error}</p>
               </motion.div>
             )}
 
@@ -209,7 +209,7 @@ export default function AuthForm({ mode }: AuthFormProps) {
             {isLogin ? "계정이 없으신가요?" : "이미 계정이 있으신가요?"}{" "}
             <Link
               href={isLogin ? "/signup" : "/login"}
-              className="text-black font-medium hover:underline transition-colors"
+              className="text-black dark:text-white font-medium hover:underline transition-colors"
             >
               {isLogin ? "회원가입" : "로그인"}
             </Link>

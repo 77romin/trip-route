@@ -336,14 +336,14 @@ export default function TripDetailClient({ trip, initialPlaces, isPublicView }: 
       <motion.div
         animate={{ width: sidebarOpen ? 380 : 0 }}
         transition={{ duration: 0.28, ease: "easeInOut" }}
-        className="flex-shrink-0 flex flex-col border-r border-gray-100 bg-white overflow-hidden"
+        className="flex-shrink-0 flex flex-col border-r border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 overflow-hidden"
       >
         {/* 헤더 */}
-        <div className="px-5 pt-5 pb-4 border-b border-gray-100">
+        <div className="px-5 pt-5 pb-4 border-b border-gray-100 dark:border-gray-800">
           {isPublicView ? (
             <Link
               href="/best-maps"
-              className="inline-flex items-center gap-1.5 text-gray-400 hover:text-black text-sm mb-3 transition-colors"
+              className="inline-flex items-center gap-1.5 text-gray-400 hover:text-black dark:hover:text-white text-sm mb-3 transition-colors"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
               최고의 지도
@@ -351,13 +351,13 @@ export default function TripDetailClient({ trip, initialPlaces, isPublicView }: 
           ) : (
             <Link
               href="/trips"
-              className="inline-flex items-center gap-1.5 text-gray-400 hover:text-black text-sm mb-3 transition-colors"
+              className="inline-flex items-center gap-1.5 text-gray-400 hover:text-black dark:hover:text-white text-sm mb-3 transition-colors"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
               내 여행
             </Link>
           )}
-          <h1 className="text-lg font-bold text-black leading-tight">
+          <h1 className="text-lg font-bold text-black dark:text-white leading-tight">
             {trip.title}
           </h1>
           {trip.description && (
@@ -377,8 +377,8 @@ export default function TripDetailClient({ trip, initialPlaces, isPublicView }: 
               className={cn(
                 "mt-3 w-full flex items-center justify-center gap-2 py-2 rounded-xl text-xs font-medium border transition-all disabled:opacity-50",
                 isPublic
-                  ? "border-green-200 text-green-600 bg-green-50 hover:bg-green-100"
-                  : "border-gray-200 text-gray-500 hover:border-gray-400 hover:text-black bg-white"
+                  ? "border-green-200 text-green-600 bg-green-50 hover:bg-green-100 dark:border-green-800 dark:text-green-400 dark:bg-green-950/40 dark:hover:bg-green-950/60"
+                  : "border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:border-gray-400 dark:hover:border-gray-500 hover:text-black dark:hover:text-white bg-white dark:bg-transparent"
               )}
             >
               {isPublic ? (
@@ -398,7 +398,7 @@ export default function TripDetailClient({ trip, initialPlaces, isPublicView }: 
             <button
               onClick={handleCopyTrip}
               disabled={isCopying}
-              className="mt-3 w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-black hover:bg-gray-800 text-white text-sm font-medium transition-colors disabled:opacity-50"
+              className="mt-3 w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-black hover:bg-gray-800 text-white dark:bg-white dark:text-black dark:hover:bg-gray-100 text-sm font-medium transition-colors disabled:opacity-50"
             >
               <Copy className="w-4 h-4" />
               {isCopying ? "복사 중..." : "내 여행으로 가져가기"}
@@ -407,15 +407,15 @@ export default function TripDetailClient({ trip, initialPlaces, isPublicView }: 
         </div>
 
         {/* 날짜 탭 */}
-        <div className="px-3 py-2.5 border-b border-gray-100 flex gap-1 overflow-x-auto">
+        <div className="px-3 py-2.5 border-b border-gray-100 dark:border-gray-800 flex gap-1 overflow-x-auto">
           {/* 전체 탭 */}
           <button
             onClick={() => setSelectedDay(0)}
             className={cn(
               "flex-shrink-0 px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all",
               selectedDay === 0
-                ? "bg-black text-white"
-                : "text-gray-400 hover:text-black hover:bg-gray-100"
+                ? "bg-black text-white dark:bg-white dark:text-black"
+                : "text-gray-400 hover:text-black dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800"
             )}
           >
             전체
@@ -428,8 +428,8 @@ export default function TripDetailClient({ trip, initialPlaces, isPublicView }: 
               className={cn(
                 "flex-shrink-0 flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all",
                 selectedDay === day
-                  ? "bg-black text-white"
-                  : "text-gray-400 hover:text-black hover:bg-gray-100"
+                  ? "bg-black text-white dark:bg-white dark:text-black"
+                  : "text-gray-400 hover:text-black dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800"
               )}
             >
               <span
@@ -450,8 +450,8 @@ export default function TripDetailClient({ trip, initialPlaces, isPublicView }: 
             // 전체 보기: 일자별 그룹
             places.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-full py-12 text-center">
-                <div className="w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center mb-3">
-                  <MapPin className="w-5 h-5 text-gray-300" />
+                <div className="w-12 h-12 rounded-xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center mb-3">
+                  <MapPin className="w-5 h-5 text-gray-300 dark:text-gray-600" />
                 </div>
                 <p className="text-gray-400 text-sm">아직 장소가 없어요</p>
               </div>
@@ -467,7 +467,7 @@ export default function TripDetailClient({ trip, initialPlaces, isPublicView }: 
                           className="w-2 h-2 rounded-full flex-shrink-0"
                           style={{ backgroundColor: getDayColor(day) }}
                         />
-                        <span className="text-xs font-semibold text-gray-500">
+                        <span className="text-xs font-semibold text-gray-500 dark:text-gray-400">
                           Day {day}
                         </span>
                       </div>
@@ -488,13 +488,13 @@ export default function TripDetailClient({ trip, initialPlaces, isPublicView }: 
             )
           ) : dayPlaces.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full py-12 text-center">
-              <div className="w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center mb-3">
-                <MapPin className="w-5 h-5 text-gray-300" />
+              <div className="w-12 h-12 rounded-xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center mb-3">
+                <MapPin className="w-5 h-5 text-gray-300 dark:text-gray-600" />
               </div>
               <p className="text-gray-400 text-sm">
                 이 날에는 아직 장소가 없어요
               </p>
-              <p className="text-gray-300 text-xs mt-1">
+              <p className="text-gray-300 dark:text-gray-600 text-xs mt-1">
                 아래 버튼으로 장소를 추가해보세요
               </p>
             </div>
@@ -531,11 +531,11 @@ export default function TripDetailClient({ trip, initialPlaces, isPublicView }: 
 
         {/* 장소 추가 버튼 (전체 보기·공개 뷰 시 숨김) */}
         {selectedDay !== 0 && !isPublicView && (
-          <div className="px-3 py-3 border-t border-gray-100">
+          <div className="px-3 py-3 border-t border-gray-100 dark:border-gray-800">
             <button
               onClick={() => setIsAddingPlace(true)}
               disabled={!isLoaded}
-              className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-dashed border-gray-200 text-gray-400 hover:text-black hover:border-black hover:bg-gray-50 text-sm font-medium transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+              className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-dashed border-gray-200 dark:border-gray-700 text-gray-400 hover:text-black dark:hover:text-white hover:border-black dark:hover:border-white hover:bg-gray-50 dark:hover:bg-gray-800 text-sm font-medium transition-all disabled:opacity-40 disabled:cursor-not-allowed"
             >
               <Plus className="w-4 h-4" />
               {isLoaded ? "장소 추가" : "지도 로딩 중..."}
@@ -549,7 +549,7 @@ export default function TripDetailClient({ trip, initialPlaces, isPublicView }: 
         {/* 사이드바 토글 버튼 */}
         <button
           onClick={() => setSidebarOpen((v) => !v)}
-          className="absolute left-0 top-1/2 -translate-y-1/2 z-20 w-6 h-16 bg-white border border-l-0 border-gray-200 rounded-r-xl flex items-center justify-center hover:bg-gray-50 transition-colors shadow-md"
+          className="absolute left-0 top-1/2 -translate-y-1/2 z-20 w-6 h-16 bg-white dark:bg-gray-900 border border-l-0 border-gray-200 dark:border-gray-700 rounded-r-xl flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors shadow-md"
         >
           {sidebarOpen ? (
             <ChevronLeft className="w-3.5 h-3.5 text-gray-500" />
@@ -571,7 +571,7 @@ export default function TripDetailClient({ trip, initialPlaces, isPublicView }: 
         />
 
         {/* 카테고리 필터 (상단 왼쪽) */}
-        <div className="absolute top-4 left-10 z-10 flex items-center gap-1.5 bg-white rounded-xl border border-gray-100 shadow-lg shadow-black/5 px-2 py-1.5 overflow-x-auto max-w-[calc(50%-2rem)]">
+        <div className="absolute top-4 left-10 z-10 flex items-center gap-1.5 bg-white dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-800 shadow-lg shadow-black/5 dark:shadow-black/30 px-2 py-1.5 overflow-x-auto max-w-[calc(50%-2rem)]">
           {CATEGORY_FILTERS.map(({ value, icon: Icon, label }) => (
             <button
               key={String(value)}
@@ -579,8 +579,8 @@ export default function TripDetailClient({ trip, initialPlaces, isPublicView }: 
               className={cn(
                 "flex-shrink-0 flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium transition-all whitespace-nowrap",
                 categoryFilter === value
-                  ? "bg-black text-white"
-                  : "text-gray-500 hover:text-black hover:bg-gray-100"
+                  ? "bg-black text-white dark:bg-white dark:text-black"
+                  : "text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800"
               )}
             >
               {Icon && <Icon className="w-3 h-3" />}
@@ -590,7 +590,7 @@ export default function TripDetailClient({ trip, initialPlaces, isPublicView }: 
         </div>
 
         {/* 이동 수단 선택 (상단 중앙) */}
-        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10 flex items-center gap-0.5 bg-white rounded-xl border border-gray-100 shadow-lg shadow-black/5 p-1">
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10 flex items-center gap-0.5 bg-white dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-800 shadow-lg shadow-black/5 dark:shadow-black/30 p-1">
           {TRAVEL_MODES.map(({ mode, icon: Icon, label }) => (
             <button
               key={mode}
@@ -599,8 +599,8 @@ export default function TripDetailClient({ trip, initialPlaces, isPublicView }: 
               className={cn(
                 "w-9 h-9 rounded-lg flex items-center justify-center transition-all",
                 travelMode === mode
-                  ? "bg-black text-white"
-                  : "text-gray-400 hover:text-black hover:bg-gray-100"
+                  ? "bg-black text-white dark:bg-white dark:text-black"
+                  : "text-gray-400 hover:text-black dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800"
               )}
             >
               <Icon className="w-4 h-4" />
@@ -609,7 +609,7 @@ export default function TripDetailClient({ trip, initialPlaces, isPublicView }: 
         </div>
 
         {/* 지도 레이어 선택 (우측 상단) */}
-        <div className="absolute top-4 right-4 z-10 flex items-center gap-0.5 bg-white rounded-xl border border-gray-100 shadow-lg shadow-black/5 p-1">
+        <div className="absolute top-4 right-4 z-10 flex items-center gap-0.5 bg-white dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-800 shadow-lg shadow-black/5 dark:shadow-black/30 p-1">
           {MAP_LAYERS.map(({ type, icon: Icon, label }) => (
             <button
               key={type}
@@ -618,8 +618,8 @@ export default function TripDetailClient({ trip, initialPlaces, isPublicView }: 
               className={cn(
                 "w-9 h-9 rounded-lg flex items-center justify-center transition-all",
                 mapLayer === type
-                  ? "bg-black text-white"
-                  : "text-gray-400 hover:text-black hover:bg-gray-100"
+                  ? "bg-black text-white dark:bg-white dark:text-black"
+                  : "text-gray-400 hover:text-black dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800"
               )}
             >
               <Icon className="w-4 h-4" />

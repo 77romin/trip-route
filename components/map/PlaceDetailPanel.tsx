@@ -152,15 +152,15 @@ export default function PlaceDetailPanel({
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -20 }}
       transition={{ duration: 0.2 }}
-      className="absolute top-0 left-0 w-[380px] h-full bg-white border-r border-gray-100 z-30 flex flex-col shadow-xl"
+      className="absolute top-0 left-0 w-[380px] h-full bg-white dark:bg-gray-900 border-r border-gray-100 dark:border-gray-800 z-30 flex flex-col shadow-xl dark:shadow-black/40"
     >
       {/* 헤더 */}
-      <div className="px-5 pt-5 pb-4 border-b border-gray-100">
+      <div className="px-5 pt-5 pb-4 border-b border-gray-100 dark:border-gray-800">
         <div className="flex items-center justify-between mb-3">
-          <h2 className="text-base font-bold text-black">장소 상세</h2>
+          <h2 className="text-base font-bold text-black dark:text-white">장소 상세</h2>
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-lg hover:bg-gray-100 flex items-center justify-center transition-colors"
+            className="w-8 h-8 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center justify-center transition-colors"
           >
             <X className="w-4 h-4 text-gray-400" />
           </button>
@@ -168,11 +168,11 @@ export default function PlaceDetailPanel({
 
         {/* 장소 기본 정보 */}
         <div className="flex items-start gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center flex-shrink-0">
-            <CatIcon className="w-5 h-5 text-gray-500" />
+          <div className="w-10 h-10 rounded-xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center flex-shrink-0">
+            <CatIcon className="w-5 h-5 text-gray-500 dark:text-gray-400" />
           </div>
           <div className="min-w-0">
-            <h3 className="text-black font-semibold text-sm">{place.name}</h3>
+            <h3 className="text-black dark:text-white font-semibold text-sm">{place.name}</h3>
             {place.address && (
               <p className="text-gray-400 text-xs mt-0.5 line-clamp-2">
                 {place.address}
@@ -202,18 +202,18 @@ export default function PlaceDetailPanel({
           </div>
         )}
         {googleDetails && googleDetails.photos.length === 0 && (
-          <div className="h-28 rounded-xl bg-gray-100 flex items-center justify-center">
-            <ImageOff className="w-6 h-6 text-gray-300" />
+          <div className="h-28 rounded-xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+            <ImageOff className="w-6 h-6 text-gray-300 dark:text-gray-600" />
           </div>
         )}
 
         {/* Google Places 정보 */}
         {googleDetails && (
-          <div className="space-y-2 rounded-xl border border-gray-100 p-3 bg-gray-50">
+          <div className="space-y-2 rounded-xl border border-gray-100 dark:border-gray-800 p-3 bg-gray-50 dark:bg-gray-800">
             {googleDetails.rating && (
               <div className="flex items-center gap-2">
                 <Star className="w-3.5 h-3.5 text-yellow-400 fill-yellow-400 flex-shrink-0" />
-                <span className="text-sm font-medium text-black">
+                <span className="text-sm font-medium text-black dark:text-white">
                   {googleDetails.rating.toFixed(1)}
                 </span>
                 {googleDetails.userRatingsTotal && (
@@ -226,7 +226,7 @@ export default function PlaceDetailPanel({
             {googleDetails.phone && (
               <div className="flex items-center gap-2">
                 <Phone className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
-                <span className="text-sm text-gray-700">{googleDetails.phone}</span>
+                <span className="text-sm text-gray-700 dark:text-gray-300">{googleDetails.phone}</span>
               </div>
             )}
             {googleDetails.website && (
@@ -247,7 +247,7 @@ export default function PlaceDetailPanel({
                 href={googleDetails.mapsUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-black transition-colors"
+                className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-black dark:hover:text-white transition-colors"
               >
                 <ExternalLink className="w-3 h-3" />
                 Google Maps에서 보기
@@ -258,7 +258,7 @@ export default function PlaceDetailPanel({
 
         {/* 카테고리 */}
         <div>
-          <label className="flex items-center gap-1.5 text-sm font-medium text-gray-600 mb-2">
+          <label className="flex items-center gap-1.5 text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">
             <MapPin className="w-3.5 h-3.5" />
             카테고리
           </label>
@@ -271,9 +271,9 @@ export default function PlaceDetailPanel({
                 className={cn(
                   "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-all",
                   category === value
-                    ? "bg-black text-white border-black"
-                    : "border-gray-200 text-gray-500",
-                  !readOnly && category !== value && "hover:border-gray-400 hover:text-black",
+                    ? "bg-black text-white border-black dark:bg-white dark:text-black dark:border-white"
+                    : "border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400",
+                  !readOnly && category !== value && "hover:border-gray-400 dark:hover:border-gray-500 hover:text-black dark:hover:text-white",
                   readOnly && "cursor-default"
                 )}
               >
@@ -286,7 +286,7 @@ export default function PlaceDetailPanel({
 
         {/* 소요시간 */}
         <div>
-          <label className="flex items-center gap-1.5 text-sm font-medium text-gray-600 mb-2">
+          <label className="flex items-center gap-1.5 text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">
             <Clock className="w-3.5 h-3.5" />
             소요시간 (분)
           </label>
@@ -298,8 +298,8 @@ export default function PlaceDetailPanel({
             placeholder={readOnly && !duration ? "미설정" : "예: 60"}
             min={0}
             className={cn(
-              "w-full h-10 rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm text-black placeholder:text-gray-400 focus:outline-none transition-all",
-              !readOnly && "focus:border-black focus:bg-white",
+              "w-full h-10 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-4 text-sm text-black dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none transition-all",
+              !readOnly && "focus:border-black dark:focus:border-white focus:bg-white dark:focus:bg-gray-700",
               readOnly && "cursor-default"
             )}
           />
@@ -307,7 +307,7 @@ export default function PlaceDetailPanel({
 
         {/* 메모 */}
         <div>
-          <label className="flex items-center gap-1.5 text-sm font-medium text-gray-600 mb-2">
+          <label className="flex items-center gap-1.5 text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">
             <StickyNote className="w-3.5 h-3.5" />
             메모
           </label>
@@ -318,8 +318,8 @@ export default function PlaceDetailPanel({
             placeholder={readOnly && !notes ? "메모 없음" : "이 장소에 대한 메모를 남겨보세요..."}
             rows={5}
             className={cn(
-              "w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-black placeholder:text-gray-400 focus:outline-none transition-all resize-none",
-              !readOnly && "focus:border-black focus:bg-white",
+              "w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-4 py-3 text-sm text-black dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none transition-all resize-none",
+              !readOnly && "focus:border-black dark:focus:border-white focus:bg-white dark:focus:bg-gray-700",
               readOnly && "cursor-default"
             )}
           />
@@ -328,7 +328,7 @@ export default function PlaceDetailPanel({
 
       {/* 저장 버튼 (readOnly면 숨김) */}
       {!readOnly && (
-        <div className="px-5 py-4 border-t border-gray-100">
+        <div className="px-5 py-4 border-t border-gray-100 dark:border-gray-800">
           <button
             onClick={handleSave}
             disabled={isPending}
@@ -336,7 +336,7 @@ export default function PlaceDetailPanel({
               "w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium transition-all",
               saved
                 ? "bg-green-500 text-white"
-                : "bg-black hover:bg-gray-800 text-white disabled:opacity-50"
+                : "bg-black hover:bg-gray-800 text-white dark:bg-white dark:text-black dark:hover:bg-gray-100 disabled:opacity-50"
             )}
           >
             {saved ? (

@@ -24,14 +24,14 @@ import { cn } from "@/lib/utils";
 
 function VisualStart() {
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex flex-col items-center gap-5">
+    <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm p-6 flex flex-col items-center gap-5">
       <div className="flex items-center gap-2.5">
         <div className="w-8 h-8 rounded-lg bg-black flex items-center justify-center">
           <Map className="w-4 h-4 text-white" />
         </div>
-        <span className="text-black font-semibold text-lg">TripRoute</span>
+        <span className="text-black dark:text-white font-semibold text-lg">TripRoute</span>
       </div>
-      <div className="w-full h-px bg-gray-100" />
+      <div className="w-full h-px bg-gray-100 dark:bg-gray-800" />
       <div className="w-full space-y-2.5">
         <div className="w-full h-11 rounded-xl bg-black flex items-center justify-center gap-2">
           <span className="text-white text-sm font-medium">
@@ -39,7 +39,7 @@ function VisualStart() {
           </span>
           <ArrowRight className="w-4 h-4 text-white" />
         </div>
-        <div className="w-full h-11 rounded-xl border border-gray-200 flex items-center justify-center">
+        <div className="w-full h-11 rounded-xl border border-gray-200 dark:border-gray-700 flex items-center justify-center">
           <span className="text-gray-400 text-sm">로그인</span>
         </div>
       </div>
@@ -50,28 +50,28 @@ function VisualStart() {
 
 function VisualNewTrip() {
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-3">
-      <div className="h-2.5 w-24 bg-gray-100 rounded" />
+    <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm p-5 space-y-3">
+      <div className="h-2.5 w-24 bg-gray-100 dark:bg-gray-700 rounded" />
       <div>
-        <div className="h-2 w-16 bg-gray-200 rounded mb-2" />
-        <div className="h-10 rounded-lg border border-black bg-white flex items-center px-3">
-          <div className="h-2.5 w-36 bg-gray-100 rounded" />
+        <div className="h-2 w-16 bg-gray-200 dark:bg-gray-700 rounded mb-2" />
+        <div className="h-10 rounded-lg border border-black bg-white dark:bg-gray-800 flex items-center px-3">
+          <div className="h-2.5 w-36 bg-gray-100 dark:bg-gray-700 rounded" />
         </div>
       </div>
       <div>
-        <div className="h-2 w-10 bg-gray-200 rounded mb-2" />
-        <div className="h-10 rounded-lg border border-gray-200 flex items-center px-3">
-          <div className="h-2.5 w-20 bg-gray-100 rounded" />
+        <div className="h-2 w-10 bg-gray-200 dark:bg-gray-700 rounded mb-2" />
+        <div className="h-10 rounded-lg border border-gray-200 dark:border-gray-700 flex items-center px-3">
+          <div className="h-2.5 w-20 bg-gray-100 dark:bg-gray-700 rounded" />
         </div>
       </div>
       <div className="flex gap-2">
         <div>
-          <div className="h-2 w-10 bg-gray-200 rounded mb-2" />
-          <div className="h-10 flex-1 rounded-lg border border-gray-200 w-32" />
+          <div className="h-2 w-10 bg-gray-200 dark:bg-gray-700 rounded mb-2" />
+          <div className="h-10 flex-1 rounded-lg border border-gray-200 dark:border-gray-700 w-32" />
         </div>
         <div>
-          <div className="h-2 w-10 bg-gray-200 rounded mb-2" />
-          <div className="h-10 flex-1 rounded-lg border border-gray-200 w-32" />
+          <div className="h-2 w-10 bg-gray-200 dark:bg-gray-700 rounded mb-2" />
+          <div className="h-10 flex-1 rounded-lg border border-gray-200 dark:border-gray-700 w-32" />
         </div>
       </div>
       <div className="flex justify-end pt-1">
@@ -84,23 +84,23 @@ function VisualNewTrip() {
 function VisualSearch() {
   const places = ["경복궁", "인사동", "광장시장"];
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 space-y-2.5">
-      <div className="h-10 rounded-lg border border-black bg-white flex items-center px-3 gap-2">
+    <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm p-4 space-y-2.5">
+      <div className="h-10 rounded-lg border border-black dark:border-gray-600 bg-white dark:bg-gray-800 flex items-center px-3 gap-2">
         <Search className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
-        <div className="h-2.5 w-32 bg-gray-100 rounded" />
+        <div className="h-2.5 w-32 bg-gray-100 dark:bg-gray-700 rounded" />
       </div>
       <div className="space-y-2">
         {places.map((_, i) => (
           <div
             key={i}
-            className="h-14 rounded-xl border border-gray-100 flex items-center px-3 gap-3"
+            className="h-14 rounded-xl border border-gray-100 dark:border-gray-800 flex items-center px-3 gap-3"
           >
-            <div className="w-7 h-7 rounded-full bg-gray-100 flex-shrink-0 flex items-center justify-center">
+            <div className="w-7 h-7 rounded-full bg-gray-100 dark:bg-gray-700 flex-shrink-0 flex items-center justify-center">
               <span className="text-xs text-gray-400 font-medium">{i + 1}</span>
             </div>
             <div className="flex-1 space-y-1.5">
-              <div className="h-2.5 bg-gray-200 rounded w-20" />
-              <div className="h-2 bg-gray-100 rounded w-28" />
+              <div className="h-2.5 bg-gray-200 dark:bg-gray-700 rounded w-20" />
+              <div className="h-2 bg-gray-100 dark:bg-gray-700 rounded w-28" />
             </div>
             <div className="h-7 w-14 rounded-lg bg-black flex-shrink-0" />
           </div>
@@ -119,7 +119,7 @@ function VisualMap() {
   ];
   return (
     <div
-      className="bg-gray-100 rounded-2xl overflow-hidden relative"
+      className="bg-gray-100 dark:bg-gray-800 rounded-2xl overflow-hidden relative"
       style={{ paddingBottom: "65%" }}
     >
       <div
@@ -182,7 +182,7 @@ function VisualTravelMode() {
   ];
   const labels = ["자동차", "대중교통", "자전거", "도보", "직선"];
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex flex-col items-center gap-5">
+    <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm p-6 flex flex-col items-center gap-5">
       <div className="flex gap-2">
         {modes.map(({ icon: Icon, active }, i) => (
           <div
@@ -191,7 +191,7 @@ function VisualTravelMode() {
               "w-12 h-12 rounded-xl flex flex-col items-center justify-center gap-0.5",
               active
                 ? "bg-black"
-                : "bg-gray-50 border border-gray-200"
+                : "bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700"
             )}
           >
             <Icon
@@ -203,9 +203,9 @@ function VisualTravelMode() {
       <p className="text-xs text-gray-400">
         {labels[1]} 선택됨
       </p>
-      <div className="w-full bg-gray-50 rounded-xl p-3 space-y-1.5">
-        <div className="h-2.5 w-40 bg-gray-200 rounded" />
-        <div className="h-2 w-24 bg-gray-100 rounded" />
+      <div className="w-full bg-gray-50 dark:bg-gray-800 rounded-xl p-3 space-y-1.5">
+        <div className="h-2.5 w-40 bg-gray-200 dark:bg-gray-700 rounded" />
+        <div className="h-2 w-24 bg-gray-100 dark:bg-gray-700 rounded" />
       </div>
     </div>
   );
@@ -218,28 +218,28 @@ function VisualDrag() {
     { lifted: false },
   ];
   return (
-    <div className="bg-gray-50 rounded-2xl border border-gray-100 p-5 space-y-2.5">
+    <div className="bg-gray-50 dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-5 space-y-2.5">
       {cards.map((card, i) => (
         <div
           key={i}
           className={cn(
-            "bg-white rounded-xl border flex items-center px-3 gap-3 h-14 transition-all",
+            "bg-white dark:bg-gray-800 rounded-xl border flex items-center px-3 gap-3 h-14 transition-all",
             card.lifted
-              ? "border-gray-300 shadow-lg shadow-black/10 -translate-y-0.5"
-              : "border-gray-100"
+              ? "border-gray-300 dark:border-gray-600 shadow-lg shadow-black/10 -translate-y-0.5"
+              : "border-gray-100 dark:border-gray-700"
           )}
         >
-          <GripVertical className="w-4 h-4 text-gray-300 cursor-grab flex-shrink-0" />
+          <GripVertical className="w-4 h-4 text-gray-300 dark:text-gray-600 cursor-grab flex-shrink-0" />
           <div className="w-7 h-7 rounded-full bg-black flex items-center justify-center flex-shrink-0">
             <span className="text-white text-xs font-bold">{i + 1}</span>
           </div>
           <div
             className={cn(
               "h-2.5 rounded flex-1",
-              card.lifted ? "bg-gray-200 w-16" : "bg-gray-100"
+              card.lifted ? "bg-gray-200 dark:bg-gray-600 w-16" : "bg-gray-100 dark:bg-gray-700"
             )}
           />
-          <div className="h-2 w-10 bg-gray-100 rounded flex-shrink-0" />
+          <div className="h-2 w-10 bg-gray-100 dark:bg-gray-700 rounded flex-shrink-0" />
         </div>
       ))}
       <p className="text-xs text-gray-400 text-center pt-1">
@@ -251,18 +251,18 @@ function VisualDrag() {
 
 function VisualShare() {
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-3">
-      <div className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
+    <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm p-5 space-y-3">
+      <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-xl">
         <div>
-          <p className="text-black text-sm font-medium">공개 여행으로 설정</p>
+          <p className="text-black dark:text-white text-sm font-medium">공개 여행으로 설정</p>
           <p className="text-gray-400 text-xs">모두의 지도에 표시됩니다</p>
         </div>
         <div className="w-11 h-6 rounded-full bg-black flex items-center justify-end px-0.5 flex-shrink-0">
           <div className="w-5 h-5 rounded-full bg-white shadow-sm" />
         </div>
       </div>
-      <div className="rounded-xl border border-gray-100 overflow-hidden">
-        <div className="h-20 bg-gray-100 flex items-center justify-center">
+      <div className="rounded-xl border border-gray-100 dark:border-gray-800 overflow-hidden">
+        <div className="h-20 bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
           <Map className="w-6 h-6 text-gray-300" />
         </div>
         <div className="p-3 space-y-2">
@@ -347,18 +347,18 @@ export default function HowToUseContent() {
   return (
     <>
       {/* ── 히어로 ─────────────────────────────────────────── */}
-      <section className="pt-32 pb-16 border-b border-gray-100 text-center">
+      <section className="pt-32 pb-16 border-b border-gray-100 dark:border-gray-800 text-center">
         <div className="max-w-3xl mx-auto px-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-gray-200 text-gray-500 text-xs font-medium mb-6">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 text-xs font-medium mb-6">
               <BookOpen className="w-3.5 h-3.5" />
               총 7단계
             </span>
-            <h1 className="text-4xl lg:text-5xl font-bold text-black mb-5 tracking-tight leading-tight">
+            <h1 className="text-4xl lg:text-5xl font-bold text-black dark:text-white mb-5 tracking-tight leading-tight">
               TripRoute로
               <br />
               <span className="text-gray-400">스마트하게 여행하는 법</span>
@@ -403,16 +403,16 @@ export default function HowToUseContent() {
                           type: "spring",
                           stiffness: 200,
                         }}
-                        className="w-12 h-12 rounded-2xl bg-black flex items-center justify-center flex-shrink-0 shadow-md shadow-black/10"
+                        className="w-12 h-12 rounded-2xl bg-black dark:bg-white flex items-center justify-center flex-shrink-0 shadow-md shadow-black/10"
                       >
-                        <Icon className="w-6 h-6 text-white" />
+                        <Icon className="w-6 h-6 text-white dark:text-black" />
                       </motion.div>
-                      <span className="text-7xl font-bold text-gray-100 leading-none select-none">
+                      <span className="text-7xl font-bold text-gray-100 dark:text-gray-800 leading-none select-none">
                         {step.number}
                       </span>
                     </div>
 
-                    <h2 className="text-2xl font-bold text-black mb-3 tracking-tight">
+                    <h2 className="text-2xl font-bold text-black dark:text-white mb-3 tracking-tight">
                       {step.title}
                     </h2>
                     <p className="text-gray-500 leading-relaxed mb-7">
@@ -428,10 +428,10 @@ export default function HowToUseContent() {
                           whileInView={{ opacity: 1, x: 0 }}
                           viewport={{ once: true }}
                           transition={{ duration: 0.4, delay: 0.2 + pi * 0.07 }}
-                          className="flex items-center gap-3 text-sm text-gray-600"
+                          className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-300"
                         >
-                          <div className="w-5 h-5 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
-                            <Check className="w-3 h-3 text-black" />
+                          <div className="w-5 h-5 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center flex-shrink-0">
+                            <Check className="w-3 h-3 text-black dark:text-white" />
                           </div>
                           {point}
                         </motion.li>
@@ -459,7 +459,7 @@ export default function HowToUseContent() {
                     viewport={{ once: true }}
                     transition={{ duration: 0.6, delay: 0.3 }}
                     style={{ transformOrigin: "left" }}
-                    className="mt-28 h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent"
+                    className="mt-28 h-px bg-gradient-to-r from-transparent via-gray-200 dark:via-gray-700 to-transparent"
                   />
                 )}
               </div>

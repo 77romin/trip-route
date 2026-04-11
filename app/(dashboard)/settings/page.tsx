@@ -21,7 +21,7 @@ export default async function SettingsPage() {
   return (
     <div className="p-8 max-w-xl">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-black mb-1">설정</h1>
+        <h1 className="text-2xl font-bold text-black dark:text-white mb-1">설정</h1>
         <p className="text-gray-400 text-sm">계정 정보와 보안을 관리하세요.</p>
       </div>
 

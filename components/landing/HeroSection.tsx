@@ -47,7 +47,7 @@ export default function HeroSection() {
             initial="hidden"
             animate="visible"
             custom={0}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-gray-200 text-gray-600 text-sm font-medium mb-8 bg-gray-50"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 text-sm font-medium mb-8 bg-gray-50 dark:bg-gray-800"
           >
             <Star className="w-3.5 h-3.5" />
             <span>스마트 여행 동선 최적화</span>
@@ -59,7 +59,7 @@ export default function HeroSection() {
             initial="hidden"
             animate="visible"
             custom={0.1}
-            className="text-5xl lg:text-6xl font-bold text-black leading-[1.1] tracking-tight mb-6"
+            className="text-5xl lg:text-6xl font-bold text-black dark:text-white leading-[1.1] tracking-tight mb-6"
           >
             나의 여행?
             <br />
@@ -113,16 +113,16 @@ export default function HeroSection() {
           className="relative animate-float"
         >
           {/* 여행 카드 목업 */}
-          <div className="relative bg-white rounded-2xl p-6 border border-gray-100 shadow-xl shadow-black/5">
+          <div className="relative bg-white dark:bg-gray-900 rounded-2xl p-6 border border-gray-100 dark:border-gray-800 shadow-xl shadow-black/5 dark:shadow-black/30">
             {/* 상단 헤더 */}
             <div className="flex items-center justify-between mb-6">
               <div>
                 <p className="text-gray-400 text-xs mb-1">여행 계획</p>
-                <h3 className="text-black font-semibold text-lg">서울 2박 3일</h3>
+                <h3 className="text-black dark:text-white font-semibold text-lg">서울 2박 3일</h3>
               </div>
-              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gray-100 border border-gray-200">
-                <div className="w-1.5 h-1.5 rounded-full bg-black animate-pulse" />
-                <span className="text-black text-xs font-medium">1일차</span>
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+                <div className="w-1.5 h-1.5 rounded-full bg-black dark:bg-white animate-pulse" />
+                <span className="text-black dark:text-white text-xs font-medium">1일차</span>
               </div>
             </div>
 
@@ -134,37 +134,37 @@ export default function HeroSection() {
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.4 + i * 0.1 }}
-                  className="flex items-center gap-3 p-3 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors group cursor-pointer"
+                  className="flex items-center gap-3 p-3 rounded-xl bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors group cursor-pointer"
                 >
                   {/* 순서 번호 */}
-                  <div className="w-7 h-7 rounded-full bg-black flex items-center justify-center flex-shrink-0">
-                    <span className="text-white text-xs font-bold">{i + 1}</span>
+                  <div className="w-7 h-7 rounded-full bg-black dark:bg-white flex items-center justify-center flex-shrink-0">
+                    <span className="text-white dark:text-black text-xs font-bold">{i + 1}</span>
                   </div>
                   {/* 정보 */}
                   <div className="flex-1 min-w-0">
-                    <p className="text-black text-sm font-medium truncate">{place.name}</p>
+                    <p className="text-black dark:text-white text-sm font-medium truncate">{place.name}</p>
                     <p className="text-gray-400 text-xs">{place.time} · {place.cat}</p>
                   </div>
-                  <MapPin className="w-4 h-4 text-gray-300 group-hover:text-black transition-colors flex-shrink-0" />
+                  <MapPin className="w-4 h-4 text-gray-300 dark:text-gray-600 group-hover:text-black dark:group-hover:text-white transition-colors flex-shrink-0" />
                 </motion.div>
               ))}
             </div>
 
             {/* 하단 요약 */}
-            <div className="mt-5 pt-4 border-t border-gray-100 flex items-center justify-between">
+            <div className="mt-5 pt-4 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between">
               <div className="text-center">
                 <p className="text-gray-400 text-xs">총 거리</p>
-                <p className="text-black font-semibold text-sm">8.2 km</p>
+                <p className="text-black dark:text-white font-semibold text-sm">8.2 km</p>
               </div>
               <div className="text-center">
                 <p className="text-gray-400 text-xs">예상 시간</p>
-                <p className="text-black font-semibold text-sm">9시간</p>
+                <p className="text-black dark:text-white font-semibold text-sm">9시간</p>
               </div>
               <div className="text-center">
                 <p className="text-gray-400 text-xs">장소</p>
-                <p className="text-black font-semibold text-sm">4곳</p>
+                <p className="text-black dark:text-white font-semibold text-sm">4곳</p>
               </div>
-              <button className="px-4 py-2 rounded-xl bg-black hover:bg-gray-800 text-white text-xs font-medium transition-colors">
+              <button className="px-4 py-2 rounded-xl bg-black dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 text-white dark:text-black text-xs font-medium transition-colors">
                 지도 보기
               </button>
             </div>
@@ -175,20 +175,20 @@ export default function HeroSection() {
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.8 }}
-            className="absolute -top-4 -right-4 bg-white rounded-xl px-3 py-2 border border-gray-100 shadow-lg shadow-black/5 flex items-center gap-2"
+            className="absolute -top-4 -right-4 bg-white dark:bg-gray-900 rounded-xl px-3 py-2 border border-gray-100 dark:border-gray-800 shadow-lg shadow-black/5 dark:shadow-black/30 flex items-center gap-2"
           >
-            <div className="w-2 h-2 rounded-full bg-black animate-pulse" />
-            <span className="text-black text-xs font-medium">최적화 완료</span>
+            <div className="w-2 h-2 rounded-full bg-black dark:bg-white animate-pulse" />
+            <span className="text-black dark:text-white text-xs font-medium">최적화 완료</span>
           </motion.div>
 
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 1.0 }}
-            className="absolute -bottom-4 -left-4 bg-white rounded-xl px-3 py-2 border border-gray-100 shadow-lg shadow-black/5"
+            className="absolute -bottom-4 -left-4 bg-white dark:bg-gray-900 rounded-xl px-3 py-2 border border-gray-100 dark:border-gray-800 shadow-lg shadow-black/5 dark:shadow-black/30"
           >
             <p className="text-gray-400 text-xs">이동 절약</p>
-            <p className="text-black font-bold text-sm">32분 단축</p>
+            <p className="text-black dark:text-white font-bold text-sm">32분 단축</p>
           </motion.div>
         </motion.div>
       </div>

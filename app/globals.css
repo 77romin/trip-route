@@ -31,6 +31,13 @@
   --foreground: #0a0a0a;
 }
 
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #fafafa;
+  }
+}
+
 * {
   box-sizing: border-box;
 }
@@ -67,10 +74,26 @@ body {
   background: #000000;
 }
 
+@media (prefers-color-scheme: dark) {
+  ::-webkit-scrollbar-thumb {
+    background: #404040;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #ffffff;
+  }
+}
+
 /* 선택 영역 */
 ::selection {
   background: rgba(0, 0, 0, 0.1);
   color: #000000;
+}
+
+@media (prefers-color-scheme: dark) {
+  ::selection {
+    background: rgba(255, 255, 255, 0.15);
+    color: #ffffff;
+  }
 }
 
 /* 플로트 애니메이션 */
@@ -121,4 +144,16 @@ body {
   background: rgba(255, 255, 255, 1);
   border-color: rgba(0, 0, 0, 0.2);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+}
+
+@media (prefers-color-scheme: dark) {
+  .glass {
+    background: rgba(17, 24, 39, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .glass-hover:hover {
+    background: rgba(17, 24, 39, 1);
+    border-color: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  }
 }

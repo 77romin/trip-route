@@ -68,10 +68,10 @@ export default function MapOverviewClient({ trips, places }: Props) {
       <motion.div
         animate={{ width: panelOpen ? 288 : 0 }}
         transition={{ duration: 0.28, ease: "easeInOut" }}
-        className="flex-shrink-0 flex flex-col border-r border-gray-100 bg-white overflow-hidden"
+        className="flex-shrink-0 flex flex-col border-r border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 overflow-hidden"
       >
-        <div className="px-5 py-4 border-b border-gray-100">
-          <h1 className="text-base font-bold text-black">한눈에 보기</h1>
+        <div className="px-5 py-4 border-b border-gray-100 dark:border-gray-800">
+          <h1 className="text-base font-bold text-black dark:text-white">한눈에 보기</h1>
           <p className="text-gray-400 text-xs mt-0.5">
             여행을 선택해 전체 동선을 확인하세요
           </p>
@@ -80,11 +80,11 @@ export default function MapOverviewClient({ trips, places }: Props) {
         <div className="flex-1 overflow-y-auto px-3 py-3 flex flex-col gap-2">
           {trips.length === 0 ? (
             <div className="flex flex-col items-center justify-center flex-1 py-10 text-center">
-              <Map className="w-8 h-8 text-gray-200 mb-2" />
+              <Map className="w-8 h-8 text-gray-200 dark:text-gray-700 mb-2" />
               <p className="text-gray-400 text-xs">여행이 없어요</p>
               <Link
                 href="/trips/new"
-                className="text-black text-xs mt-2 hover:underline font-medium"
+                className="text-black dark:text-white text-xs mt-2 hover:underline font-medium"
               >
                 여행 만들기
               </Link>
@@ -99,8 +99,8 @@ export default function MapOverviewClient({ trips, places }: Props) {
                   className={cn(
                     "w-full text-left px-3.5 py-3 rounded-xl transition-all border",
                     isSelected
-                      ? "bg-black text-white border-black"
-                      : "text-gray-700 hover:text-black hover:bg-gray-50 border-gray-100 hover:border-gray-200"
+                      ? "bg-black text-white border-black dark:bg-white dark:text-black dark:border-white"
+                      : "text-gray-700 dark:text-gray-300 hover:text-black dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800 border-gray-100 dark:border-gray-800 hover:border-gray-200 dark:hover:border-gray-700"
                   )}
                 >
                   <p className="text-sm font-semibold truncate">{trip.title}</p>
@@ -108,7 +108,7 @@ export default function MapOverviewClient({ trips, places }: Props) {
                     <p
                       className={cn(
                         "flex items-center gap-1 text-xs mt-1",
-                        isSelected ? "text-white/60" : "text-gray-400"
+                        isSelected ? "text-white/60 dark:text-black/60" : "text-gray-400"
                       )}
                     >
                       <CalendarDays className="w-3 h-3 flex-shrink-0" />
@@ -119,7 +119,7 @@ export default function MapOverviewClient({ trips, places }: Props) {
                     <p
                       className={cn(
                         "flex items-center gap-1 text-xs mt-0.5",
-                        isSelected ? "text-white/60" : "text-gray-400"
+                        isSelected ? "text-white/60 dark:text-black/60" : "text-gray-400"
                       )}
                     >
                       <MapPin className="w-3 h-3 flex-shrink-0" />
@@ -137,7 +137,7 @@ export default function MapOverviewClient({ trips, places }: Props) {
           <div className="px-3 py-3 border-t border-gray-100">
             <Link
               href={`/trips/${selectedTripId}`}
-              className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl border border-gray-200 text-gray-500 hover:text-black hover:border-black hover:bg-gray-50 text-sm font-medium transition-all"
+              className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white hover:border-black dark:hover:border-white hover:bg-gray-50 dark:hover:bg-gray-800 text-sm font-medium transition-all"
             >
               여행 편집하기
               <ArrowRight className="w-3.5 h-3.5" />
@@ -151,7 +151,7 @@ export default function MapOverviewClient({ trips, places }: Props) {
         {/* 사이드바 토글 버튼 — 항상 표시 */}
         <button
           onClick={() => setPanelOpen((v) => !v)}
-          className="absolute left-0 top-1/2 -translate-y-1/2 z-20 w-6 h-16 bg-white border border-l-0 border-gray-200 rounded-r-xl flex items-center justify-center hover:bg-gray-50 transition-colors shadow-md"
+          className="absolute left-0 top-1/2 -translate-y-1/2 z-20 w-6 h-16 bg-white dark:bg-gray-900 border border-l-0 border-gray-200 dark:border-gray-700 rounded-r-xl flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors shadow-md"
         >
           {panelOpen ? (
             <ChevronLeft className="w-3.5 h-3.5 text-gray-500" />
@@ -169,7 +169,7 @@ export default function MapOverviewClient({ trips, places }: Props) {
         />
 
         {/* 이동수단 선택 (상단 중앙) */}
-        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10 flex items-center gap-0.5 bg-white rounded-xl border border-gray-100 shadow-lg shadow-black/5 p-1">
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10 flex items-center gap-0.5 bg-white dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-800 shadow-lg shadow-black/5 dark:shadow-black/30 p-1">
           {TRAVEL_MODES.map(({ mode, icon: Icon, label }) => (
             <button
               key={mode}
@@ -178,8 +178,8 @@ export default function MapOverviewClient({ trips, places }: Props) {
               className={cn(
                 "w-9 h-9 rounded-lg flex items-center justify-center transition-all",
                 travelMode === mode
-                  ? "bg-black text-white"
-                  : "text-gray-400 hover:text-black hover:bg-gray-100"
+                  ? "bg-black text-white dark:bg-white dark:text-black"
+                  : "text-gray-400 hover:text-black dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800"
               )}
             >
               <Icon className="w-4 h-4" />
@@ -189,7 +189,7 @@ export default function MapOverviewClient({ trips, places }: Props) {
 
         {/* Day 범례 */}
         {existingDays.length > 0 && (
-          <div className="absolute bottom-6 left-4 z-10 bg-white rounded-xl border border-gray-100 shadow-lg shadow-black/5 px-3.5 py-2.5">
+          <div className="absolute bottom-6 left-4 z-10 bg-white dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-800 shadow-lg shadow-black/5 dark:shadow-black/30 px-3.5 py-2.5">
             <p className="text-gray-400 text-xs font-medium mb-2">일자별 동선</p>
             <div className="flex flex-col gap-1.5">
               {existingDays.map((day) => {
@@ -200,7 +200,7 @@ export default function MapOverviewClient({ trips, places }: Props) {
                       className="w-2.5 h-2.5 rounded-full flex-shrink-0"
                       style={{ backgroundColor: getDayColor(day) }}
                     />
-                    <span className="text-xs font-medium text-gray-700">
+                    <span className="text-xs font-medium text-gray-700 dark:text-gray-300">
                       Day {day}
                     </span>
                     <span className="text-xs text-gray-400">

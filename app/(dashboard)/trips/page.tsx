@@ -73,14 +73,14 @@ export default async function TripsPage() {
       {/* 헤더 */}
       <div className="flex items-center justify-between mb-10">
         <div>
-          <h1 className="text-2xl font-bold text-black mb-1">내 여행</h1>
+          <h1 className="text-2xl font-bold text-black dark:text-white mb-1">내 여행</h1>
           <p className="text-gray-400 text-sm">
             {trips.length}개의 여행 계획
           </p>
         </div>
         <Link
           href="/trips/new"
-          className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-black hover:bg-gray-800 text-white text-sm font-medium transition-colors"
+          className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-black hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-100 text-white text-sm font-medium transition-colors"
         >
           <PlusCircle className="w-4 h-4" />
           새 여행 만들기
@@ -120,9 +120,9 @@ function TripCard({
 
   return (
     <Link href={`/trips/${id}`}>
-      <div className="bg-white rounded-2xl p-6 border border-gray-100 hover:border-gray-200 hover:shadow-md hover:shadow-black/5 cursor-pointer group transition-all">
+      <div className="bg-white dark:bg-gray-900 rounded-2xl p-6 border border-gray-100 dark:border-gray-800 hover:border-gray-200 dark:hover:border-gray-700 hover:shadow-md hover:shadow-black/5 cursor-pointer group transition-all">
         {/* 커버 이미지 */}
-        <div className="w-full h-32 rounded-xl bg-gray-100 border border-gray-100 mb-5 overflow-hidden flex items-center justify-center">
+        <div className="w-full h-32 rounded-xl bg-gray-100 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 mb-5 overflow-hidden flex items-center justify-center">
           {mapUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
@@ -135,7 +135,7 @@ function TripCard({
           )}
         </div>
 
-        <h3 className="text-black font-semibold text-base mb-1.5 group-hover:text-gray-700 transition-colors">
+        <h3 className="text-black dark:text-white font-semibold text-base mb-1.5 group-hover:text-gray-700 dark:group-hover:text-gray-200 transition-colors">
           {title}
         </h3>
 
@@ -162,10 +162,10 @@ function EmptyState({ isGuest }: { isGuest: boolean }) {
   if (isGuest) {
     return (
       <div className="flex flex-col items-center justify-center py-24 text-center">
-        <div className="w-16 h-16 rounded-2xl bg-gray-100 border border-gray-100 flex items-center justify-center mb-5">
+        <div className="w-16 h-16 rounded-2xl bg-gray-100 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 flex items-center justify-center mb-5">
           <MapPin className="w-7 h-7 text-gray-300" />
         </div>
-        <h3 className="text-black font-semibold text-lg mb-2">
+        <h3 className="text-black dark:text-white font-semibold text-lg mb-2">
           로그인하면 여행을 저장할 수 있어요
         </h3>
         <p className="text-gray-400 text-sm mb-8 max-w-xs">
@@ -174,14 +174,14 @@ function EmptyState({ isGuest }: { isGuest: boolean }) {
         <div className="flex gap-3">
           <Link
             href="/trips/new"
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-black text-sm font-medium transition-colors"
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-black dark:text-white text-sm font-medium transition-colors"
           >
             <PlusCircle className="w-4 h-4" />
             여행 만들어보기
           </Link>
           <Link
             href="/login"
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-black hover:bg-gray-800 text-white text-sm font-medium transition-colors"
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-black hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-100 text-white text-sm font-medium transition-colors"
           >
             <LogIn className="w-4 h-4" />
             로그인
@@ -196,7 +196,7 @@ function EmptyState({ isGuest }: { isGuest: boolean }) {
       <div className="w-16 h-16 rounded-2xl bg-gray-100 border border-gray-100 flex items-center justify-center mb-5">
         <MapPin className="w-7 h-7 text-gray-300" />
       </div>
-      <h3 className="text-black font-semibold text-lg mb-2">
+      <h3 className="text-black dark:text-white font-semibold text-lg mb-2">
         아직 여행이 없어요
       </h3>
       <p className="text-gray-400 text-sm mb-8 max-w-xs">

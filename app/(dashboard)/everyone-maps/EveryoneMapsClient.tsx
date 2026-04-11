@@ -135,10 +135,10 @@ function TripCard({
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35, delay: Math.min(index * 0.04, 0.4) }}
-      className="bg-white rounded-2xl border border-gray-100 hover:border-gray-200 hover:shadow-md hover:shadow-black/5 transition-all flex flex-col overflow-hidden group"
+      className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 hover:border-gray-200 dark:hover:border-gray-700 hover:shadow-md hover:shadow-black/5 transition-all flex flex-col overflow-hidden group"
     >
       <Link href={`/best-maps/${trip.id}`} className="flex flex-col flex-1">
-        <div className="h-36 bg-gray-100 flex items-center justify-center relative flex-shrink-0 overflow-hidden">
+        <div className="h-36 bg-gray-100 dark:bg-gray-800 flex items-center justify-center relative flex-shrink-0 overflow-hidden">
           {mapUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={mapUrl} alt={trip.title} className="w-full h-full object-cover" />
@@ -153,7 +153,7 @@ function TripCard({
         </div>
 
         <div className="p-5 flex flex-col flex-1">
-          <h3 className="font-semibold text-black text-base mb-1 line-clamp-2 group-hover:text-gray-700 transition-colors">
+          <h3 className="font-semibold text-black dark:text-white text-base mb-1 line-clamp-2 group-hover:text-gray-700 dark:group-hover:text-gray-200 transition-colors">
             {trip.title}
           </h3>
           {trip.description && (
@@ -177,7 +177,7 @@ function TripCard({
         </div>
       </Link>
 
-      <div className="flex items-center justify-between px-5 pb-5 pt-4 border-t border-gray-100">
+      <div className="flex items-center justify-between px-5 pb-5 pt-4 border-t border-gray-100 dark:border-gray-800">
         <div className="flex items-center gap-3">
           <span className="flex items-center gap-1 text-xs text-gray-400">
             <Copy className="w-3.5 h-3.5" />
@@ -187,7 +187,7 @@ function TripCard({
             onClick={onLike}
             className={cn(
               "flex items-center gap-1 text-xs transition-colors",
-              isLiked ? "text-black" : "text-gray-400 hover:text-black"
+              isLiked ? "text-black dark:text-white" : "text-gray-400 hover:text-black dark:hover:text-white"
             )}
           >
             <Heart
@@ -202,7 +202,7 @@ function TripCard({
         <button
           onClick={onCopy}
           disabled={isCopying}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-black hover:bg-gray-800 text-white text-xs font-medium transition-colors disabled:opacity-50"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-black hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-100 text-white text-xs font-medium transition-colors disabled:opacity-50"
         >
           <Copy className="w-3 h-3" />
           {isCopying ? "복사 중..." : "내 것으로 복사하기"}
@@ -216,10 +216,10 @@ function TripCard({
 function EmptyState({ hasFilter }: { hasFilter: boolean }) {
   return (
     <div className="flex flex-col items-center justify-center py-24 text-center">
-      <div className="w-16 h-16 rounded-2xl bg-gray-100 border border-gray-100 flex items-center justify-center mb-5">
+      <div className="w-16 h-16 rounded-2xl bg-gray-100 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 flex items-center justify-center mb-5">
         <Frown className="w-7 h-7 text-gray-300" />
       </div>
-      <h3 className="text-black font-semibold text-lg mb-2">
+      <h3 className="text-black dark:text-white font-semibold text-lg mb-2">
         {hasFilter ? "검색 결과가 없어요" : "아직 공개된 여행이 없어요"}
       </h3>
       <p className="text-gray-400 text-sm max-w-xs">
@@ -355,12 +355,12 @@ export default function EveryoneMapsClient({
   return (
     <div className="h-full flex flex-col overflow-hidden">
       {/* ── 헤더 · 검색 ───────────────────────────────────────── */}
-      <div className="bg-white border-b border-gray-100 px-8 pt-8 pb-6 flex-shrink-0">
+      <div className="bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 px-8 pt-8 pb-6 flex-shrink-0">
         <div className="flex items-center gap-3 mb-1">
-          <div className="w-9 h-9 rounded-xl bg-gray-100 flex items-center justify-center">
-            <Globe className="w-5 h-5 text-gray-500" />
+          <div className="w-9 h-9 rounded-xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+            <Globe className="w-5 h-5 text-gray-500 dark:text-gray-400" />
           </div>
-          <h1 className="text-2xl font-bold text-black">모두의 지도</h1>
+          <h1 className="text-2xl font-bold text-black dark:text-white">모두의 지도</h1>
         </div>
         <p className="text-gray-400 text-sm mb-5">
           공개된 모든 여행 계획을 구경하고 내 것으로 복사해보세요
@@ -372,12 +372,12 @@ export default function EveryoneMapsClient({
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="지역, 여행 제목으로 검색 (예: 서울, 파리, 제주)"
-            className="w-full pl-11 pr-10 h-11 rounded-xl border border-gray-200 bg-gray-50 text-black placeholder:text-gray-400 text-sm focus:outline-none focus:border-black focus:bg-white transition-all"
+            className="w-full pl-11 pr-10 h-11 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-black dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 text-sm focus:outline-none focus:border-black dark:focus:border-white focus:bg-white dark:focus:bg-gray-700 transition-all"
           />
           {query && (
             <button
               onClick={() => setQuery("")}
-              className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-md hover:bg-gray-100 transition-colors"
+              className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
             >
               <X className="w-3.5 h-3.5 text-gray-400" />
             </button>
@@ -386,7 +386,7 @@ export default function EveryoneMapsClient({
       </div>
 
       {/* ── 지역 필터 ──────────────────────────────────────────── */}
-      <div className="bg-white border-b border-gray-100 px-8 py-3 flex-shrink-0 space-y-2">
+      <div className="bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 px-8 py-3 flex-shrink-0 space-y-2">
         <div className="flex gap-1">
           {(["전체", "국내", "해외"] as Category[]).map((cat) => (
             <button
@@ -395,8 +395,8 @@ export default function EveryoneMapsClient({
               className={cn(
                 "px-4 py-1.5 rounded-lg text-sm font-medium transition-all",
                 category === cat
-                  ? "bg-black text-white"
-                  : "text-gray-500 hover:text-black hover:bg-gray-100"
+                  ? "bg-black text-white dark:bg-white dark:text-black"
+                  : "text-gray-500 hover:text-black dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800"
               )}
             >
               {cat}
@@ -424,8 +424,8 @@ export default function EveryoneMapsClient({
                     className={cn(
                       "px-3 py-1 rounded-lg text-xs font-medium border transition-all",
                       subcategory === sub
-                        ? "bg-black text-white border-black"
-                        : "border-gray-200 text-gray-600 hover:border-gray-400 hover:text-black"
+                        ? "bg-black text-white border-black dark:bg-white dark:text-black dark:border-white"
+                        : "border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:border-gray-400 dark:hover:border-gray-500 hover:text-black dark:hover:text-white"
                     )}
                   >
                     {sub}
@@ -453,8 +453,8 @@ export default function EveryoneMapsClient({
                     className={cn(
                       "px-2.5 py-0.5 rounded-md text-xs border transition-all",
                       city === c
-                        ? "bg-gray-800 text-white border-gray-800"
-                        : "border-gray-200 text-gray-500 hover:border-gray-400 hover:text-black"
+                        ? "bg-gray-800 text-white border-gray-800 dark:bg-gray-200 dark:text-black dark:border-gray-200"
+                        : "border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:border-gray-400 dark:hover:border-gray-500 hover:text-black dark:hover:text-white"
                     )}
                   >
                     {c}

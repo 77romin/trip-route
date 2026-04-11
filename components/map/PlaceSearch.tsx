@@ -85,7 +85,7 @@ export default function PlaceSearch({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="absolute inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-6"
+      className="absolute inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-6"
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
       <motion.div
@@ -93,14 +93,14 @@ export default function PlaceSearch({
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.96, y: 10 }}
         transition={{ duration: 0.2 }}
-        className="w-full max-w-lg bg-white rounded-2xl border border-gray-100 shadow-xl p-6 flex flex-col gap-5"
+        className="w-full max-w-lg bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-xl p-6 flex flex-col gap-5"
       >
         {/* 헤더 */}
         <div className="flex items-center justify-between">
-          <h2 className="text-black font-semibold">Day {day} — 장소 추가</h2>
+          <h2 className="text-black dark:text-white font-semibold">Day {day} — 장소 추가</h2>
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-lg hover:bg-gray-100 flex items-center justify-center transition-colors"
+            className="w-8 h-8 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center justify-center transition-colors"
           >
             <X className="w-4 h-4 text-gray-400" />
           </button>
@@ -108,7 +108,7 @@ export default function PlaceSearch({
 
         {/* 장소 검색 */}
         <div>
-          <label className="text-sm text-gray-600 font-medium mb-1.5 block">
+          <label className="text-sm text-gray-600 dark:text-gray-300 font-medium mb-1.5 block">
             장소 검색
           </label>
           <div className="relative">
@@ -123,12 +123,12 @@ export default function PlaceSearch({
               <input
                 type="text"
                 placeholder="장소 이름이나 주소를 입력하세요"
-                className="w-full h-11 rounded-xl bg-gray-50 border border-gray-200 pl-10 pr-4 text-black placeholder:text-gray-400 text-sm focus:outline-none focus:border-black focus:bg-white transition-all"
+                className="w-full h-11 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 pl-10 pr-4 text-black dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 text-sm focus:outline-none focus:border-black dark:focus:border-white focus:bg-white dark:focus:bg-gray-700 transition-all"
               />
             </Autocomplete>
           </div>
           {selectedPlace && (
-            <div className="mt-2 flex items-center gap-2 text-sm text-black">
+            <div className="mt-2 flex items-center gap-2 text-sm text-black dark:text-white">
               <CheckCircle2 className="w-3.5 h-3.5 flex-shrink-0" />
               <span className="truncate">{selectedPlace.name}</span>
             </div>
@@ -137,7 +137,7 @@ export default function PlaceSearch({
 
         {/* 카테고리 */}
         <div>
-          <label className="text-sm text-gray-600 font-medium mb-1.5 block">
+          <label className="text-sm text-gray-600 dark:text-gray-300 font-medium mb-1.5 block">
             카테고리
           </label>
           <div className="flex flex-wrap gap-1.5">
@@ -148,8 +148,8 @@ export default function PlaceSearch({
                 className={cn(
                   "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border",
                   category === value
-                    ? "bg-black border-black text-white"
-                    : "bg-gray-50 border-gray-200 text-gray-500 hover:text-black hover:border-gray-300"
+                    ? "bg-black border-black text-white dark:bg-white dark:border-white dark:text-black"
+                    : "bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white hover:border-gray-300 dark:hover:border-gray-500"
                 )}
               >
                 <Icon className="w-3 h-3" />
@@ -162,7 +162,7 @@ export default function PlaceSearch({
         {/* 체류시간 + 메모 */}
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="text-sm text-gray-600 font-medium mb-1.5 flex items-center gap-1.5">
+            <label className="text-sm text-gray-600 dark:text-gray-300 font-medium mb-1.5 flex items-center gap-1.5">
               <Clock className="w-3.5 h-3.5" />
               체류 시간 (분)
             </label>
@@ -172,11 +172,11 @@ export default function PlaceSearch({
               onChange={(e) => setDuration(e.target.value)}
               placeholder="예: 60"
               min="0"
-              className="w-full h-10 rounded-xl bg-gray-50 border border-gray-200 px-4 text-black placeholder:text-gray-400 text-sm focus:outline-none focus:border-black focus:bg-white transition-all"
+              className="w-full h-10 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-4 text-black dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 text-sm focus:outline-none focus:border-black dark:focus:border-white focus:bg-white dark:focus:bg-gray-700 transition-all"
             />
           </div>
           <div>
-            <label className="text-sm text-gray-600 font-medium mb-1.5 flex items-center gap-1.5">
+            <label className="text-sm text-gray-600 dark:text-gray-300 font-medium mb-1.5 flex items-center gap-1.5">
               <StickyNote className="w-3.5 h-3.5" />
               메모
             </label>
@@ -185,7 +185,7 @@ export default function PlaceSearch({
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="간단한 메모"
-              className="w-full h-10 rounded-xl bg-gray-50 border border-gray-200 px-4 text-black placeholder:text-gray-400 text-sm focus:outline-none focus:border-black focus:bg-white transition-all"
+              className="w-full h-10 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-4 text-black dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 text-sm focus:outline-none focus:border-black dark:focus:border-white focus:bg-white dark:focus:bg-gray-700 transition-all"
             />
           </div>
         </div>

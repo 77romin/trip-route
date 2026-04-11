@@ -39,7 +39,7 @@ const FEATURES: { icon: LucideIcon; title: string; description: string }[] = [
 
 export default function FeaturesSection() {
   return (
-    <section className="py-32 relative bg-gray-50">
+    <section className="py-32 relative bg-gray-50 dark:bg-gray-900">
       <div className="max-w-7xl mx-auto px-6">
         {/* 섹션 헤더 */}
         <motion.div
@@ -52,10 +52,10 @@ export default function FeaturesSection() {
           <p className="text-gray-400 text-sm font-medium uppercase tracking-widest mb-4">
             Features
           </p>
-          <h2 className="text-4xl lg:text-5xl font-bold text-black mb-5">
+          <h2 className="text-4xl lg:text-5xl font-bold text-black dark:text-white mb-5">
             여행이 더 즐거워지는
             <br />
-            <span className="text-gray-300">스마트한 기능들</span>
+            <span className="text-gray-300 dark:text-gray-600">스마트한 기능들</span>
           </h2>
           <p className="text-gray-500 text-lg max-w-md mx-auto">
             복잡한 여행 계획을 단순하게. 필요한 기능을 딱 맞게 제공합니다.
@@ -73,13 +73,13 @@ export default function FeaturesSection() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: i * 0.08 }}
-                className="group bg-white rounded-2xl p-6 border border-gray-100 cursor-default transition-all duration-300 hover:border-gray-200 hover:shadow-lg hover:shadow-black/5"
+                className="group bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-100 dark:border-gray-700 cursor-default transition-all duration-300 hover:border-gray-200 dark:hover:border-gray-600 hover:shadow-lg hover:shadow-black/5 dark:hover:shadow-black/20"
               >
                 {/* 아이콘 */}
-                <div className="w-11 h-11 rounded-xl bg-gray-100 flex items-center justify-center mb-5 group-hover:bg-black transition-colors duration-300">
-                  <Icon className="w-5 h-5 text-gray-500 group-hover:text-white transition-colors duration-300" />
+                <div className="w-11 h-11 rounded-xl bg-gray-100 dark:bg-gray-700 flex items-center justify-center mb-5 group-hover:bg-black dark:group-hover:bg-white transition-colors duration-300">
+                  <Icon className="w-5 h-5 text-gray-500 dark:text-gray-400 group-hover:text-white dark:group-hover:text-black transition-colors duration-300" />
                 </div>
-                <h3 className="text-black font-semibold text-base mb-2">
+                <h3 className="text-black dark:text-white font-semibold text-base mb-2">
                   {feature.title}
                 </h3>
                 <p className="text-gray-500 text-sm leading-relaxed">

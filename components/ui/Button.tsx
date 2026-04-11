@@ -20,13 +20,13 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           "inline-flex items-center justify-center gap-2 font-medium rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-black/20 disabled:opacity-50 disabled:cursor-not-allowed",
           {
             // variant
-            "bg-black hover:bg-gray-800 text-white shadow-md shadow-black/10 hover:shadow-black/20":
+            "bg-black hover:bg-gray-800 text-white shadow-md shadow-black/10 hover:shadow-black/20 dark:bg-white dark:text-black dark:hover:bg-gray-100":
               variant === "primary",
-            "bg-gray-100 hover:bg-gray-200 text-black border border-gray-200 hover:border-gray-300":
+            "bg-gray-100 hover:bg-gray-200 text-black border border-gray-200 hover:border-gray-300 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-white dark:border-gray-700 dark:hover:border-gray-600":
               variant === "secondary",
-            "hover:bg-gray-100 text-gray-500 hover:text-black":
+            "hover:bg-gray-100 text-gray-500 hover:text-black dark:hover:bg-gray-800 dark:hover:text-white":
               variant === "ghost",
-            "border border-gray-200 hover:border-black text-black hover:bg-gray-50":
+            "border border-gray-200 hover:border-black text-black hover:bg-gray-50 dark:border-gray-700 dark:hover:border-white dark:text-white dark:hover:bg-gray-800":
               variant === "outline",
           },
           {

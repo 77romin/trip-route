@@ -34,13 +34,13 @@ function Avatar({ user }: { user: User }) {
         alt="프로필"
         width={32}
         height={32}
-        className="w-8 h-8 rounded-full object-cover border border-gray-200"
+        className="w-8 h-8 rounded-full object-cover border border-gray-200 dark:border-gray-700"
       />
     );
   }
 
   return (
-    <div className="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center text-xs font-semibold flex-shrink-0">
+    <div className="w-8 h-8 rounded-full bg-black dark:bg-white text-white dark:text-black flex items-center justify-center text-xs font-semibold flex-shrink-0">
       {initials}
     </div>
   );
@@ -90,17 +90,17 @@ export default function Navbar() {
       className={cn(
         "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
         scrolled || menuOpen
-          ? "bg-white/90 backdrop-blur-xl border-b border-black/5 py-3"
+          ? "bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl border-b border-black/5 dark:border-white/5 py-3"
           : "bg-transparent py-5"
       )}
     >
       <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
         {/* 로고 */}
         <Link href="/" className="flex items-center gap-2.5 group">
-          <div className="w-8 h-8 rounded-lg bg-black flex items-center justify-center group-hover:bg-gray-800 transition-colors">
-            <Map className="w-4 h-4 text-white" />
+          <div className="w-8 h-8 rounded-lg bg-black dark:bg-white flex items-center justify-center group-hover:bg-gray-800 dark:group-hover:bg-gray-200 transition-colors">
+            <Map className="w-4 h-4 text-white dark:text-black" />
           </div>
-          <span className="text-black font-semibold text-lg tracking-tight">
+          <span className="text-black dark:text-white font-semibold text-lg tracking-tight">
             TripRoute
           </span>
         </Link>
@@ -111,7 +111,7 @@ export default function Navbar() {
             <Link
               key={label}
               href={href}
-              className="text-gray-400 hover:text-black text-sm transition-colors"
+              className="text-gray-400 hover:text-black dark:hover:text-white text-sm transition-colors"
             >
               {label}
             </Link>
@@ -155,14 +155,14 @@ export default function Navbar() {
 
         {/* 모바일 햄버거 버튼 */}
         <button
-          className="md:hidden flex items-center justify-center w-9 h-9 rounded-lg hover:bg-black/5 transition-colors"
+          className="md:hidden flex items-center justify-center w-9 h-9 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
           onClick={() => setMenuOpen((v) => !v)}
           aria-label="메뉴"
         >
           {menuOpen ? (
-            <X className="w-5 h-5 text-black" />
+            <X className="w-5 h-5 text-black dark:text-white" />
           ) : (
-            <Menu className="w-5 h-5 text-black" />
+            <Menu className="w-5 h-5 text-black dark:text-white" />
           )}
         </button>
       </div>
@@ -175,7 +175,7 @@ export default function Navbar() {
               key={label}
               href={href}
               onClick={() => setMenuOpen(false)}
-              className="py-2.5 text-gray-600 hover:text-black text-sm font-medium transition-colors border-b border-gray-100 last:border-0"
+              className="py-2.5 text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white text-sm font-medium transition-colors border-b border-gray-100 dark:border-gray-800 last:border-0"
             >
               {label}
             </Link>

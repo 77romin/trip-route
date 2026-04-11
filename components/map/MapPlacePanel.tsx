@@ -62,7 +62,7 @@ export default function MapPlacePanel({ info, dayCount, onClose, onAdd }: Props)
       onClick={onClose}
     >
       {/* 반투명 배경 */}
-      <div className="absolute inset-0 bg-black/30 backdrop-blur-[1px]" />
+      <div className="absolute inset-0 bg-black/30 dark:bg-black/60 backdrop-blur-[1px]" />
 
       {/* 팝업 카드 */}
       <motion.div
@@ -70,26 +70,26 @@ export default function MapPlacePanel({ info, dayCount, onClose, onAdd }: Props)
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.93, y: 12 }}
         transition={{ duration: 0.2, ease: "easeOut" }}
-        className="relative bg-white rounded-2xl shadow-2xl w-[420px] max-h-[82vh] flex flex-col overflow-hidden z-50"
+        className="relative bg-white dark:bg-gray-900 rounded-2xl shadow-2xl dark:shadow-black/50 w-[420px] max-h-[82vh] flex flex-col overflow-hidden z-50"
         onClick={(e) => e.stopPropagation()}
       >
         {/* 헤더 */}
-        <div className="px-5 pt-5 pb-4 border-b border-gray-100 flex-shrink-0">
+        <div className="px-5 pt-5 pb-4 border-b border-gray-100 dark:border-gray-800 flex-shrink-0">
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-base font-bold text-black">장소 정보</h2>
+            <h2 className="text-base font-bold text-black dark:text-white">장소 정보</h2>
             <button
               onClick={onClose}
-              className="w-8 h-8 rounded-lg hover:bg-gray-100 flex items-center justify-center transition-colors"
+              className="w-8 h-8 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center justify-center transition-colors"
             >
               <X className="w-4 h-4 text-gray-400" />
             </button>
           </div>
           <div className="flex items-start gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center flex-shrink-0">
-              <MapPin className="w-5 h-5 text-gray-500" />
+            <div className="w-10 h-10 rounded-xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center flex-shrink-0">
+              <MapPin className="w-5 h-5 text-gray-500 dark:text-gray-400" />
             </div>
             <div className="min-w-0">
-              <h3 className="text-black font-semibold text-sm">{info.name}</h3>
+              <h3 className="text-black dark:text-white font-semibold text-sm">{info.name}</h3>
               {info.address && (
                 <p className="text-gray-400 text-xs mt-0.5 line-clamp-2">{info.address}</p>
               )}
@@ -113,18 +113,18 @@ export default function MapPlacePanel({ info, dayCount, onClose, onAdd }: Props)
               ))}
             </div>
           ) : (
-            <div className="h-28 rounded-xl bg-gray-100 flex items-center justify-center">
-              <ImageOff className="w-6 h-6 text-gray-300" />
+            <div className="h-28 rounded-xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+              <ImageOff className="w-6 h-6 text-gray-300 dark:text-gray-600" />
             </div>
           )}
 
           {/* 상세 정보 */}
           {hasInfo && (
-            <div className="space-y-2 rounded-xl border border-gray-100 p-3 bg-gray-50">
+            <div className="space-y-2 rounded-xl border border-gray-100 dark:border-gray-800 p-3 bg-gray-50 dark:bg-gray-800">
               {info.rating && (
                 <div className="flex items-center gap-2">
                   <Star className="w-3.5 h-3.5 text-yellow-400 fill-yellow-400 flex-shrink-0" />
-                  <span className="text-sm font-medium text-black">
+                  <span className="text-sm font-medium text-black dark:text-white">
                     {info.rating.toFixed(1)}
                   </span>
                   {info.userRatingsTotal && (
@@ -137,7 +137,7 @@ export default function MapPlacePanel({ info, dayCount, onClose, onAdd }: Props)
               {info.phone && (
                 <div className="flex items-center gap-2">
                   <Phone className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
-                  <span className="text-sm text-gray-700">{info.phone}</span>
+                  <span className="text-sm text-gray-700 dark:text-gray-300">{info.phone}</span>
                 </div>
               )}
               {info.website && (
@@ -158,7 +158,7 @@ export default function MapPlacePanel({ info, dayCount, onClose, onAdd }: Props)
                   href={info.mapsUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-black transition-colors"
+                  className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-black dark:hover:text-white transition-colors"
                 >
                   <ExternalLink className="w-3 h-3" />
                   Google Maps에서 보기
@@ -170,7 +170,7 @@ export default function MapPlacePanel({ info, dayCount, onClose, onAdd }: Props)
 
         {/* 내 계획에 추가 */}
         {onAdd && (
-          <div className="px-5 py-4 border-t border-gray-100 flex-shrink-0 space-y-3">
+          <div className="px-5 py-4 border-t border-gray-100 dark:border-gray-800 flex-shrink-0 space-y-3">
             <p className="text-xs text-gray-500 font-medium">몇 일차에 추가할까요?</p>
             <div className="flex gap-1.5 flex-wrap">
               {Array.from({ length: dayCount }, (_, i) => i + 1).map((day) => (
@@ -180,8 +180,8 @@ export default function MapPlacePanel({ info, dayCount, onClose, onAdd }: Props)
                   className={cn(
                     "px-3 py-1.5 rounded-lg text-xs font-medium border transition-all",
                     selectedDay === day
-                      ? "bg-black text-white border-black"
-                      : "border-gray-200 text-gray-500 hover:border-gray-400"
+                      ? "bg-black text-white border-black dark:bg-white dark:text-black dark:border-white"
+                      : "border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:border-gray-400 dark:hover:border-gray-500"
                   )}
                 >
                   Day {day}
@@ -194,7 +194,7 @@ export default function MapPlacePanel({ info, dayCount, onClose, onAdd }: Props)
                 "w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium transition-all",
                 added
                   ? "bg-green-500 text-white"
-                  : "bg-black hover:bg-gray-800 text-white"
+                  : "bg-black hover:bg-gray-800 text-white dark:bg-white dark:text-black dark:hover:bg-gray-100"
               )}
             >
               {added ? (

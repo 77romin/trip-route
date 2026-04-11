@@ -53,14 +53,14 @@ export default function PlaceCard({
     <div
       onClick={onClick}
       className={cn(
-        "group bg-white rounded-xl border border-gray-100 p-3.5 flex items-start gap-2 hover:border-gray-200 transition-all",
+        "group bg-white dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-800 p-3.5 flex items-start gap-2 hover:border-gray-200 dark:hover:border-gray-700 transition-all",
         onClick && "cursor-pointer"
       )}
     >
       {/* 드래그 핸들 */}
       {dragControls && (
         <div
-          className="cursor-grab active:cursor-grabbing touch-none text-gray-300 hover:text-gray-500 flex-shrink-0 mt-0.5 pt-0.5"
+          className="cursor-grab active:cursor-grabbing touch-none text-gray-300 dark:text-gray-600 hover:text-gray-500 dark:hover:text-gray-400 flex-shrink-0 mt-0.5 pt-0.5"
           onPointerDown={(e) => {
             e.preventDefault();
             dragControls.start(e);
@@ -71,8 +71,8 @@ export default function PlaceCard({
       )}
 
       {/* 순서 번호 */}
-      <div className="w-6 h-6 rounded-full bg-black flex items-center justify-center flex-shrink-0 mt-0.5">
-        <span className="text-xs font-bold text-white">{index}</span>
+      <div className="w-6 h-6 rounded-full bg-black dark:bg-white flex items-center justify-center flex-shrink-0 mt-0.5">
+        <span className="text-xs font-bold text-white dark:text-black">{index}</span>
       </div>
 
       {/* 내용 */}
@@ -80,12 +80,12 @@ export default function PlaceCard({
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0">
             <div className="flex items-center gap-1.5 mb-0.5">
-              <div className="p-0.5 rounded bg-gray-100">
-                <Icon className="w-3 h-3 text-gray-500" />
+              <div className="p-0.5 rounded bg-gray-100 dark:bg-gray-800">
+                <Icon className="w-3 h-3 text-gray-500 dark:text-gray-400" />
               </div>
-              <span className="text-xs text-gray-500">{config.label}</span>
+              <span className="text-xs text-gray-500 dark:text-gray-400">{config.label}</span>
             </div>
-            <h4 className="text-black text-sm font-medium truncate">
+            <h4 className="text-black dark:text-white text-sm font-medium truncate">
               {place.name}
             </h4>
             {place.address && (
@@ -99,9 +99,9 @@ export default function PlaceCard({
           {!readOnly && onRemove && (
             <button
               onClick={onRemove}
-              className="opacity-0 group-hover:opacity-100 transition-opacity w-6 h-6 rounded-lg hover:bg-red-50 flex items-center justify-center flex-shrink-0"
+              className="opacity-0 group-hover:opacity-100 transition-opacity w-6 h-6 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/40 flex items-center justify-center flex-shrink-0"
             >
-              <X className={cn("w-3.5 h-3.5 text-gray-300 hover:text-red-500")} />
+              <X className={cn("w-3.5 h-3.5 text-gray-300 dark:text-gray-600 hover:text-red-500")} />
             </button>
           )}
         </div>
