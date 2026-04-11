@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 
 export default function DemoPage() {
   return (
-    <div className="h-screen flex flex-col overflow-hidden bg-gray-50">
+    <div className="h-screen flex flex-col overflow-hidden bg-gray-50 dark:bg-gray-950">
       <DemoDetailClient trip={DEMO_TRIP} places={DEMO_PLACES} />
     </div>
   );
